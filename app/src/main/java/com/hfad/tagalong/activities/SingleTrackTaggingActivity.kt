@@ -45,38 +45,38 @@ class SingleTrackTaggingActivity : AppCompatActivity() {
         nameTextView.ellipsize = TextUtils.TruncateAt.END
 
         val tagManagerView = findViewById<TagManagerView>(R.id.single_track_tag_manager)
-        tagManagerView.apply {
-            val dbHelper = DBHelper(context)
-            thread {
-                // Initialize playlists
-                val currentTags = dbHelper.selectAllTags()
-                runOnUiThread {
-                    setTagList(currentTags)
-                    setOnClickTagCloseIcon { _, tagName ->
-                        thread {
-                            dbHelper.deleteSongWithTag(track.id, tagName)
-                        }
-                    }
-                    setOnAddTagButtonClick {
-                        val tagName = getText().toLowerCase()
-                        thread {
-                            try {
-                                dbHelper.insertSongWithTag(track, tagName)
-                                setText("")
-                            } catch (ex: SQLiteConstraintException) {
-                                runOnUiThread {
-                                    Toast.makeText(
-                                        context,
-                                        getString(R.string.repeatedTagName),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            }
-                        }
-                    }
-                    ready()
-                }
-            }
-        }
+//        tagManagerView.apply {
+//            val dbHelper = DBHelper(context)
+//            thread {
+//                // Initialize playlists
+//                val currentTags = dbHelper.selectAllTags()
+//                runOnUiThread {
+//                    setTagList(currentTags)
+//                    setOnClickTagCloseIcon { _, tagName ->
+//                        thread {
+//                            dbHelper.deleteSongWithTag(track.id, tagName)
+//                        }
+//                    }
+//                    setOnAddTagButtonClick {
+//                        val tagName = getText().toLowerCase()
+//                        thread {
+//                            try {
+//                                dbHelper.insertSongWithTag(track, tagName)
+//                                setText("")
+//                            } catch (ex: SQLiteConstraintException) {
+//                                runOnUiThread {
+//                                    Toast.makeText(
+//                                        context,
+//                                        getString(R.string.repeatedTagName),
+//                                        Toast.LENGTH_LONG
+//                                    ).show()
+//                                }
+//                            }
+//                        }
+//                    }
+//                    ready()
+//                }
+//            }
+//        }
     }
 }

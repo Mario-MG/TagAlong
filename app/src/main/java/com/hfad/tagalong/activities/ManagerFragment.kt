@@ -24,14 +24,14 @@ class ManagerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val manager = activity?.findViewById<TagManagerView>(R.id.prueba)
-        manager?.apply {
-            setTagList(arrayListOf("Quizá"))
-            setOnClickTagCloseIcon { _, tagName ->
-                thread {
-                    val dbHelper = DBHelper(activity!!)
-                }
-            }
-            ready()
-        }
+//        manager?.apply {
+//            setTagList(arrayListOf("Quizá"))
+//            setOnClickTagCloseIcon { _, tagName ->
+//                thread {
+//                    val dbHelper = DBHelper(activity!!)
+//                }
+//            }
+//            ready()
+//        }
     }
 }
