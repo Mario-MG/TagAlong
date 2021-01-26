@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Tag Along</string>
+    <string name="playlist_image_description">Playlist image</string>
+    <string name="track_image_description">Track image</string>
+    <plurals name="playlist_size">
+        <item quantity="one">%d song</item>
+        <item quantity="other">%d songs</item>
+    </plurals>
+    <string name="track_info">%s | %s</string>
+    <string name="no_tags_text">Tags will appear here after you add them</string>
+    <string name="addTag_button_text">Add</string>
+    <string name="addTag_editText_hint">Add a tag</string>
+    <string name="repeatedTagName">This song already has that tag</string>
+    <string name="loading_text">Loading...</string>
+    <string name="delete_tag_icon_description">Delete tag icon</string>
+    <string name="playlists_tab_name">Playlists</string>
+    <string name="tags_tab_name">Tags</string>
+    <string name="manager_tab_name">Manager</string>
+</resources>

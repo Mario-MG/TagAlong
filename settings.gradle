@@ -1,0 +1,3 @@
+include ':tagmanagerview'
+include ':app'
+rootProject.name = "Tag Along"
