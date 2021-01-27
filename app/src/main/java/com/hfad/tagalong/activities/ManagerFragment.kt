@@ -23,7 +23,7 @@ class ManagerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val manager = activity?.findViewById<TagManagerView>(R.id.prueba)
+//        val manager = activity?.findViewById<TagManagerView>(R.id.prueba)
 //        manager?.apply {
 //            setTagList(arrayListOf("Quizá"))
 //            setOnClickTagCloseIcon { _, tagName ->
