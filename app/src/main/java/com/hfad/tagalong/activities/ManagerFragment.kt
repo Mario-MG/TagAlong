@@ -28,7 +28,39 @@ class ManagerFragment : Fragment() {
             setTagList(arrayListOf("Quizá"))
             setOnClickTagCloseIcon { _, tagName ->
                 thread {
-                    val dbHelper = DBHelper(activity!!)
+                    val dbHelper = DBHelper(activity)
+                    // Initialize current tags
+                    val allTags = dbHelper.selectAllTags()
+                    activity.runOnUiThread {
+                        autoCompleteTagList = allTags
+                    }
+                    dbHelper.close()
+                }
+            }
+            val createPlaylistButton = findViewById<Button>(R.id.create_playlist_button)
+            createPlaylistButton.setOnClickListener {
+                val selectedTags = tagManagerView.tagList
+                thread {
+                    val dbHelper = DBHelper(activity)
+                    val songIds = dbHelper.selectSongIdsWithAllTags(*selectedTags.toTypedArray())
+                    val playlistCreatedResponse = PlaylistManager.createPlaylist("TagAlong Playlist")
+                    if (songIds?.isNotEmpty() == true && playlistCreatedResponse?.success() == true) {
+                        val playlistId = playlistCreatedResponse.result?.id!!
+                        val songsAddedToPlaylistResponse = PlaylistManager.addTracksToPlaylist(
+                            playlistId,
+                            *songIds.toTypedArray()
+                        )
+                        if (songsAddedToPlaylistResponse?.statusCode == 200) {
+                            activity.runOnUiThread {
+                                Toast.makeText(
+                                    activity,
+                                    "Playlist created successfully",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
+                    }
+                    dbHelper.close()
                 }
             }
             ready()
