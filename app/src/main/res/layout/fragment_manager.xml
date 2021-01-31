@@ -6,22 +6,56 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".activities.ManagerFragment">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_margin="16dp">
 
-    <com.hfad.tagalong.views.CustomTagManagerForPlaylistCreationView
-        android:id="@+id/tag_manager_for_playlist_creation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/create_playlist_top_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_playlist_top_text"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/create_playlist_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Click me" />
+        <com.hfad.tagalong.views.CustomTagManagerForPlaylistCreationView
+            android:id="@+id/tag_manager_for_playlist_creation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/create_playlist_top_text_view" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/create_playlist_bottom_text_view_pre_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_playlist_bottom_text_pre_spinner"
+            app:layout_constraintBottom_toBottomOf="@id/create_playlist_spinner"
+            app:layout_constraintStart_toStartOf="@id/tag_manager_for_playlist_creation" />
+
+        <Spinner
+            android:id="@+id/create_playlist_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/create_playlist_spinner_entries"
+            app:layout_constraintTop_toBottomOf="@id/tag_manager_for_playlist_creation"
+            app:layout_constraintStart_toEndOf="@id/create_playlist_bottom_text_view_pre_spinner" />
+
+        <TextView
+            android:id="@+id/create_playlist_bottom_text_view_post_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_playlist_bottom_text_post_spinner"
+            app:layout_constraintBottom_toBottomOf="@id/create_playlist_spinner"
+            app:layout_constraintStart_toEndOf="@id/create_playlist_spinner" />
+
+        <Button
+            android:id="@+id/create_playlist_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create_playlist_button_text"
+            app:layout_constraintTop_toBottomOf="@id/tag_manager_for_playlist_creation"
+            app:layout_constraintEnd_toEndOf="@id/tag_manager_for_playlist_creation" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

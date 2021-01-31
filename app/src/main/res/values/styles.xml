@@ -8,6 +8,8 @@
 
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColorSecondary">@color/lightGrey</item>
+        <item name="android:textColorTertiary">@color/white</item>
+
         <item name="android:colorBackground">@color/black</item>
         <item name="android:panelColorBackground">@color/darkGrey</item>
     </style>
