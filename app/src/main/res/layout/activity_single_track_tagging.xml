@@ -43,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/track_name_tv" />
 
-    <com.hfad.tagalong.views.CustomTagManagerView
+    <com.hfad.tagalong.views.CustomTagManagerForSingleTrackView
         android:id="@+id/single_track_tag_manager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
