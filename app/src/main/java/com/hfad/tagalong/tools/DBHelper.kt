@@ -22,79 +22,61 @@ class DBHelper(context: Context)
     }
 
     fun selectAllTags(): ArrayList<String> {
-        val tagsList = ArrayList<String>()
-        val cursor = readableDB.rawQuery(SQL_SELECT_DISTINCT_TAGS, null)
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast) {
-                val tagName = cursor.getString(0)
-                tagsList.add(tagName)
-                cursor.moveToNext()
-            }
-        }
-        cursor.close()
-        return tagsList
+        return runSimpleSelect(SQL_SELECT_DISTINCT_TAGS)
     }
 
-    fun selectTagNamesBySongId(songId: String, vararg moreSongIds: String): ArrayList<String> {
-        val tagsList = ArrayList<String>()
-        val selectionArg = moreSongIds.joinToString(", ", songId)
-        val cursor = readableDB.rawQuery(SQL_SELECT_TAG_NAMES_BY_SONG_ID, arrayOf(selectionArg))
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast) {
-                val tagName = cursor.getString(0)
-                tagsList.add(tagName)
-                cursor.moveToNext()
-            }
-        }
-        cursor.close()
-        return tagsList
+    fun selectTagNamesBySongId(vararg songIds: String): ArrayList<String> {
+        return runSimpleSelect(SQL_SELECT_TAG_NAMES_BY_SONG_ID, songIds)
     }
 
-    fun selectSongIdsWithAnyTags(vararg tagNames: String): ArrayList<String>? {
-        if (tagNames.isEmpty()) {
-            return null
-        }
-        val songsList = ArrayList<String>()
-        val selectionArg = tagNames.joinToString("', '", "'", "'")
-        val sql = SQL_SELECT_SONG_IDS_WITH_ANY_TAG_NAMES.format(selectionArg)
-        val cursor = readableDB.rawQuery(sql, null)
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast) {
-                val songId = cursor.getString(0)
-                songsList.add(songId)
-                cursor.moveToNext()
-            }
-        }
-        cursor.close()
-        return songsList
+    fun selectSongIdsWithAnyTags(vararg tagNames: String): ArrayList<String> {
+        return runSimpleSelect(SQL_SELECT_SONG_IDS_WITH_ANY_TAG_NAMES, tagNames)
     }
 
-    fun selectSongIdsWithAllTags(vararg tagNames: String): ArrayList<String>? {
-        if (tagNames.isEmpty()) {
-            return null
-        } else if (tagNames.size == 1) {
+    fun selectSongIdsWithAllTags(vararg tagNames: String): ArrayList<String> {
+        if (tagNames.size == 1) {
             return selectSongIdsWithAnyTags(tagNames[0])
         }
-        val songsList = ArrayList<String>()
         val sql = buildSqlSelectSongIdsWithAllTags(tagNames)
-        val cursor = readableDB.rawQuery(sql, null)
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast) {
-                val songId = cursor.getString(0)
-                songsList.add(songId)
-                cursor.moveToNext()
-            }
-        }
-        cursor.close()
-        return songsList
+        return runSimpleSelect(sql)
     }
 
     private fun buildSqlSelectSongIdsWithAllTags(tagNames: Array<out String>): String {
-        val sqlSubselects = tagNames.map { tagName -> SQL_SELECT_SONG_IDS_WITH_ALL_TAG_NAMES_SUBSELECT.format("'$tagName'") }
+        val sqlSubselects = tagNames.map { tagName ->
+            SQL_SELECT_SONG_IDS_WITH_ALL_TAG_NAMES_SUBSELECT.format("'$tagName'")
+        }
         return sqlSubselects.joinToString(
             SQL_SELECT_SONG_IDS_WITH_ALL_TAG_NAMES_SEPARATOR,
             SQL_SELECT_SONG_IDS_WITH_ALL_TAG_NAMES_MAIN_SELECT,
             ")")
+    }
+
+    private fun runSimpleSelect(
+        baseSql: String,
+        selectionArgs: Array<out String>? = null
+    ): ArrayList<String> {
+        var sql = baseSql
+        if (selectionArgs?.isEmpty() == true) {
+            return emptyList<String>() as ArrayList<String>
+        } else if (selectionArgs !== null) {
+            val selectionArgsString = selectionArgs.joinToString("', '", "'", "'")
+            sql = sql.format(selectionArgsString)
+        }
+        return getStringArrayListFromSql(sql)
+    }
+
+    private fun getStringArrayListFromSql(sql: String): ArrayList<String> {
+        val stringArrayList = ArrayList<String>()
+        val cursor = readableDB.rawQuery(sql, null)
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast) {
+                val stringItem = cursor.getString(0)
+                stringArrayList.add(stringItem)
+                cursor.moveToNext()
+            }
+        }
+        cursor.close()
+        return stringArrayList
     }
 
     fun selectSongDataForIds(songId: String, vararg moreSongIds: String): ArrayList<CustomTrack> {
@@ -156,21 +138,23 @@ class DBHelper(context: Context)
     }
 
     private fun insertIntoSongsTags(songId: String, tagName: String) {
-        writableDB.insertOrThrow(TABLE_SONGS_TAGS, null, ContentValues().apply {
+        val insertValues = ContentValues().apply {
             put(SONG_ID, songId)
             put(TAG_NAME, tagName)
-        })
+        }
+        writableDB.insertOrThrow(TABLE_SONGS_TAGS, null, insertValues)
     }
 
     private fun insertSongData(track: CustomTrack) {
+        val insertValues = ContentValues().apply {
+            put(SONG_ID, track.id)
+            put(SONG_NAME, track.name)
+            put(SONG_ALBUM, track.album)
+            put(SONG_ARTISTS, track.artists.joinToString(", "))
+            put(SONG_IMAGE_URL, track.imageUrl)
+        }
         try {
-            writableDB.insertOrThrow(TABLE_SONGS, null, ContentValues().apply {
-                put(SONG_ID, track.id)
-                put(SONG_NAME, track.name)
-                put(SONG_ALBUM, track.album)
-                put(SONG_ARTISTS, track.artists.joinToString(", "))
-                put(SONG_IMAGE_URL, track.imageUrl)
-            })
+            writableDB.insertOrThrow(TABLE_SONGS, null, insertValues)
         } catch (ex: SQLiteConstraintException) {}
     }
 
@@ -216,10 +200,6 @@ class DBHelper(context: Context)
                     WHERE songs_tags.$TAG_NAME IN (?)
             """
 
-        fun createTableSongs(db: SQLiteDatabase) {
-            db.execSQL(SQL_CREATE_SONGS)
-        }
-
         private const val SQL_CREATE_SONGS_TAGS =
             """
                 CREATE TABLE IF NOT EXISTS $TABLE_SONGS_TAGS (
@@ -237,7 +217,7 @@ class DBHelper(context: Context)
         private const val SQL_SELECT_TAG_NAMES_BY_SONG_ID =
             """
                 SELECT $TAG_NAME FROM $TABLE_SONGS_TAGS
-                    WHERE $SONG_ID IN (?)
+                    WHERE $SONG_ID IN (%s)
             """
 
         private const val SQL_SELECT_SONG_IDS_WITH_ANY_TAG_NAMES =
@@ -262,6 +242,10 @@ class DBHelper(context: Context)
                 SELECT $SONG_ID FROM $TABLE_SONGS_TAGS
                     WHERE $TAG_NAME = %s
             """
+
+        fun createTableSongs(db: SQLiteDatabase) {
+            db.execSQL(SQL_CREATE_SONGS)
+        }
 
         fun createTableSongsTags(db: SQLiteDatabase) {
             db.execSQL(SQL_CREATE_SONGS_TAGS)

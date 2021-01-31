@@ -46,7 +46,7 @@ class ManagerFragment : Fragment() {
                     val dbHelper = DBHelper(activity)
                     val songIds = dbHelper.selectSongIdsWithAllTags(*selectedTags.toTypedArray())
                     val playlistCreatedResponse = PlaylistManager.createPlaylist("TagAlong Playlist")
-                    if (songIds?.isNotEmpty() == true && playlistCreatedResponse?.success() == true) {
+                    if (songIds.isNotEmpty() && playlistCreatedResponse?.success() == true) {
                         val playlistId = playlistCreatedResponse.result?.id!!
                         val songsAddedToPlaylistResponse = PlaylistManager.addTracksToPlaylist(
                             playlistId,
