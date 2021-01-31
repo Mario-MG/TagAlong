@@ -109,12 +109,12 @@ class DBHelper(context: Context)
                 val songImageUrl = cursor.getString(3)
                 songsList.add(
                     CustomTrack(
-                    songId,
-                    songName,
-                    songAlbum,
-                    songArtists,
-                    songImageUrl
-                )
+                        songId,
+                        songName,
+                        songAlbum,
+                        songArtists,
+                        songImageUrl
+                    )
                 )
                 cursor.moveToNext()
             }

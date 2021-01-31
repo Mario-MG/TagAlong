@@ -31,7 +31,8 @@ class TrackListActivity : AppCompatActivity() {
             } else {
                 val tagName = intent.getStringExtra(Extras.TAG_NAME)
                 val dbHelper = DBHelper(this)
-                dbHelper.selectSongDataByTagNames(tagName!!)
+                val tracksWithTag = dbHelper.selectSongDataByTagNames(tagName!!)
+                tracksWithTag
             }
             // Create Adapter passing in the tracks
             val adapter = TracksAdapter(this, tracks as ArrayList<CustomTrack>, playlistId)

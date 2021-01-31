@@ -39,6 +39,7 @@ class TagViewAdapter(
             val newPosition = mTags.indexOf(tagName)
             mTags.remove(tagName)
             notifyItemRemoved(newPosition)
+            dbHelper.close()
         }
     }
 

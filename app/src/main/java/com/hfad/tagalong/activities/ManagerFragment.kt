@@ -5,10 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import com.hfad.tagalong.R
 import com.hfad.tagalong.tools.DBHelper
-import com.hfad.tagmanagerview.TagManagerView
+import com.hfad.tagalong.tools.api.PlaylistManager
+import com.hfad.tagalong.views.CustomTagManagerForPlaylistCreationView
 import kotlin.concurrent.thread
 
 class ManagerFragment : Fragment() {
@@ -23,10 +25,10 @@ class ManagerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val manager = activity?.findViewById<TagManagerView>(R.id.prueba)
-        manager?.apply {
-            setTagList(arrayListOf("Quizá"))
-            setOnClickTagCloseIcon { _, tagName ->
+        activity?.apply {
+            val activity = this
+            val tagManagerView = findViewById<CustomTagManagerForPlaylistCreationView>(R.id.tag_manager_for_playlist_creation)
+            tagManagerView.apply {
                 thread {
                     val dbHelper = DBHelper(activity)
                     // Initialize current tags
@@ -63,7 +65,6 @@ class ManagerFragment : Fragment() {
                     dbHelper.close()
                 }
             }
-            ready()
         }
     }
 }
