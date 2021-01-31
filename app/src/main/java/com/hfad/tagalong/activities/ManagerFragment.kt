@@ -1,6 +1,5 @@
 package com.hfad.tagalong.activities
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -45,7 +44,7 @@ class ManagerFragment : Fragment() {
                 val selectedTags = tagManagerView.tagList
                 thread {
                     val dbHelper = DBHelper(activity)
-                    val songIds = dbHelper.selectSongIdsByTagName(*selectedTags.toTypedArray())
+                    val songIds = dbHelper.selectSongIdsWithAllTags(*selectedTags.toTypedArray())
                     val playlistCreatedResponse = PlaylistManager.createPlaylist("TagAlong Playlist")
                     if (songIds?.isNotEmpty() == true && playlistCreatedResponse?.success() == true) {
                         val playlistId = playlistCreatedResponse.result?.id!!
