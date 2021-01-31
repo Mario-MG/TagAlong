@@ -43,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/track_name_tv" />
 
-    <com.hfad.tagmanagerview.TagManagerView
+    <com.hfad.tagalong.views.CustomTagManagerForSingleTrackView
         android:id="@+id/single_track_tag_manager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -51,8 +51,6 @@
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:tagTextColor="@color/white"
-        app:tagBackgroundColor="@color/darkGrey"
         app:layout_constraintTop_toBottomOf="@id/track_info_tv"
         app:layout_constraintBottom_toBottomOf="parent"/>
 

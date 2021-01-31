@@ -7,4 +7,5 @@ object Endpoint {
     const val PROFILE = "/v1/me"
     const val CREATE_PLAYLIST = "/v1/users/{user_id}/playlists"
     const val UNFOLLOW_PLAYLIST = "/v1/playlists/{playlist_id}/followers"
+    const val ADD_ITEMS_TO_PLAYLIST = "/v1/playlists/{playlist_id}/tracks"
 }

@@ -45,6 +45,7 @@ class AllTagsFragment : Fragment() {
                     // Set layout manager to position the items
                     rvTags.layoutManager = LinearLayoutManager(activity)
                 }
+                dbHelper.close()
             }
         }
     }

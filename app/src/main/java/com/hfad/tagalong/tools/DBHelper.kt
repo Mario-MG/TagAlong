@@ -50,9 +50,12 @@ class DBHelper(context: Context)
         return tagsList
     }
 
-    fun selectSongIdsByTagName(tagName: String, vararg moreTagNames: String): ArrayList<String> {
+    fun selectSongIdsByTagName(vararg tagNames: String): ArrayList<String>? {
+        if (tagNames.isEmpty()) {
+            return null
+        }
         val songsList = ArrayList<String>()
-        val selectionArg = moreTagNames.joinToString(", ", tagName)
+        val selectionArg = tagNames.joinToString(", ")
         val cursor = readableDB.rawQuery(SQL_SELECT_SONG_IDS_BY_TAG_NAME, arrayOf(selectionArg))
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast) {
@@ -77,12 +80,12 @@ class DBHelper(context: Context)
                 val songImageUrl = cursor.getString(3)
                 songsList.add(
                     CustomTrack(
-                    songId,
-                    songName,
-                    songAlbum,
-                    songArtists,
-                    songImageUrl
-                )
+                        songId,
+                        songName,
+                        songAlbum,
+                        songArtists,
+                        songImageUrl
+                    )
                 )
                 cursor.moveToNext()
             }

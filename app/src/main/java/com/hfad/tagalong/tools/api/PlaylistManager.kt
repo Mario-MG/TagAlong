@@ -83,4 +83,33 @@ object PlaylistManager {
 
         return RequestManager.sendRequest(request)
     }
+
+    fun addTracksToPlaylist(playlistId: String, vararg songIds: String): ApiResponse<Snapshot>? {
+        if (songIds.isEmpty() || songIds.size > 100) {
+            return null
+        }
+
+        val token = TokenManager.getToken()
+
+        val songUris = songIds.map { songId -> "\"spotify:track:$songId\""}
+
+        val body = """
+            {
+                "uris": [${songUris.joinToString(",")}]
+            }
+        """.trimIndent().toRequestBody(ContentType.CONTENT_TYPE_JSON.toMediaType())
+
+        val request = Request.Builder()
+            .url(
+                URLBuilder()
+                    .from(Host.API, Endpoint.ADD_ITEMS_TO_PLAYLIST)
+                    .replace("playlist_id", playlistId)
+                    .build()
+            )
+            .header("Authorization", "Bearer $token")
+            .post(body)
+            .build()
+
+        return RequestManager.sendRequest(request)
+    }
 }
