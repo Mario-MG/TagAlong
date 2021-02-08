@@ -4,6 +4,7 @@ class URLBuilder {
     private var host = ""
     private var endpoint = ""
     private var toReplace = HashMap<String, String>()
+    private var params = HashMap<String, String>()
 
     fun host(host: String): URLBuilder {
         this.host = host
@@ -27,11 +28,21 @@ class URLBuilder {
         return this
     }
 
+    fun param(key: String, value: String): URLBuilder {
+        params[key] = value
+        return this
+    }
+
     fun build(): String {
         var url = host + endpoint
         toReplace.forEach { (key, value) ->
             url = url.replace("{${key}}", value)
         }
+        val paramsList = ArrayList<String>()
+        params.forEach { (key, value) ->
+            paramsList.add("$key=$value")
+        }
+        url += paramsList.joinToString("&")
         return url
     }
 }
