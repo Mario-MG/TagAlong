@@ -16,4 +16,5 @@
     <string name="playlists_tab_name">Playlists</string>
     <string name="tags_tab_name">Tags</string>
     <string name="manager_tab_name">Manager</string>
+    <string name="login_button_text">Login with Spotify</string>
 </resources>
