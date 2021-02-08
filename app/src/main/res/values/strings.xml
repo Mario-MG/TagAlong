@@ -24,4 +24,5 @@
         <item>ALL</item>
         <item>ANY</item>
     </string-array>
+    <string name="login_button_text">Login with Spotify</string>
 </resources>
