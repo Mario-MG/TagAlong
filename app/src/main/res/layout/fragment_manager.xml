@@ -36,14 +36,16 @@
             android:id="@+id/create_playlist_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
             android:entries="@array/create_playlist_spinner_entries"
-            app:layout_constraintTop_toBottomOf="@id/tag_manager_for_playlist_creation"
-            app:layout_constraintStart_toEndOf="@id/create_playlist_bottom_text_view_pre_spinner" />
+            app:layout_constraintStart_toEndOf="@id/create_playlist_bottom_text_view_pre_spinner"
+            app:layout_constraintTop_toBottomOf="@id/tag_manager_for_playlist_creation" />
 
         <TextView
             android:id="@+id/create_playlist_bottom_text_view_post_spinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
             android:text="@string/create_playlist_bottom_text_post_spinner"
             app:layout_constraintBottom_toBottomOf="@id/create_playlist_spinner"
             app:layout_constraintStart_toEndOf="@id/create_playlist_spinner" />

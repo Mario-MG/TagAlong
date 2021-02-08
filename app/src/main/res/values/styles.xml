@@ -14,4 +14,9 @@
         <item name="android:panelColorBackground">@color/darkGrey</item>
     </style>
 
+    <style name="spinnerItemStyle" parent="android:Widget.TextView.SpinnerItem">
+        <item name="android:background">@color/light_grey</item>
+        <item name="android:padding">2dp</item>
+    </style>
+
 </resources>
