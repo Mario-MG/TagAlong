@@ -1,5 +1,6 @@
 package com.hfad.tagalong.activities
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -24,6 +25,11 @@ class ManagerFragment : Fragment() {
     private lateinit var createPlaylistButton: Button
     private lateinit var spinner: Spinner
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mActivity = context as FragmentActivity
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -34,11 +40,7 @@ class ManagerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        if (activity != null) {
-            mActivity = activity!!
-            initializeFragment()
-        }
+        initializeFragment()
     }
 
     private fun initializeFragment() {
@@ -54,6 +56,20 @@ class ManagerFragment : Fragment() {
         }
     }
 
+    private fun initializeAutoCompleteTagList() {
+        val allTags = getAllTagsFromDb()
+        mActivity.runOnUiThread {
+            tagManagerView.autoCompleteTagList = allTags
+        }
+    }
+
+    private fun getAllTagsFromDb(): ArrayList<String> {
+        mDbHelper = DBHelper(mActivity)
+        val allTags = mDbHelper.selectAllTags()
+        mDbHelper.close()
+        return allTags
+    }
+
     private fun initializeSpinner() {
         spinner = mActivity.findViewById(R.id.create_playlist_spinner)
         val adapter = ArrayAdapter.createFromResource(
@@ -64,17 +80,8 @@ class ManagerFragment : Fragment() {
         spinner.adapter = adapter
     }
 
-    private fun initializeAutoCompleteTagList() {
-        mDbHelper = DBHelper(mActivity)
-        val allTags = mDbHelper.selectAllTags()
-        mActivity.runOnUiThread {
-            tagManagerView.autoCompleteTagList = allTags
-        }
-        mDbHelper.close()
-    }
-
     private fun initializeCreatePlaylistButton() {
-        createPlaylistButton = mActivity.findViewById<Button>(R.id.create_playlist_button)
+        createPlaylistButton = mActivity.findViewById(R.id.create_playlist_button)
         createPlaylistButton.setOnClickListener {
             onClickCreatePlaylistButton()
         }
@@ -88,12 +95,17 @@ class ManagerFragment : Fragment() {
     }
 
     private fun createPlaylistWithSelectedTags(selectedTags: ArrayList<String>) {
-        mDbHelper = DBHelper(mActivity)
-        val songIds = selectSongIdsWithSelectedTags(selectedTags)
+        val songIds = getSongIdsForSelectedTagsFromDb(selectedTags)
         if (songIds.isNotEmpty()) {
             createAndPopulatePlaylist(songIds)
         }
+    }
+
+    private fun getSongIdsForSelectedTagsFromDb(selectedTags: ArrayList<String>): List<String> {
+        mDbHelper = DBHelper(mActivity)
+        val songIds = selectSongIdsWithSelectedTags(selectedTags)
         mDbHelper.close()
+        return songIds
     }
 
     private fun createAndPopulatePlaylist(songIds: List<String>) {

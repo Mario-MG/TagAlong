@@ -87,7 +87,7 @@ class PlaylistsAdapter (
         // TODO: Añadir "Cargando" o algo por el estilo
         val oldItemCount = itemCount
         thread {
-            val newPlaylists = CustomPlaylist.createListOfPlaylists(oldItemCount)
+            val newPlaylists = CustomPlaylist.getAllPlaylistsFromApi(oldItemCount)
             activity.runOnUiThread {
                 mPlaylists.addAll(newPlaylists)
                 this.notifyItemRangeInserted(oldItemCount, itemCount)

@@ -12,7 +12,7 @@ data class CustomTrack(
     companion object {
         private val totalTracksByPlaylistId = HashMap<String, Int>()
 
-        fun createListOfTracks(playlistId: String, offset: Int = 0, limit: Int = 100): ArrayList<CustomTrack> {
+        fun getTracksFromApi(playlistId: String, offset: Int = 0, limit: Int = 100): ArrayList<CustomTrack> {
             val tracks = ArrayList<CustomTrack>()
             val apiResponse = PlaylistManager.getPlaylistTracks(playlistId, offset, limit)
             if (apiResponse?.statusCode == 200) {

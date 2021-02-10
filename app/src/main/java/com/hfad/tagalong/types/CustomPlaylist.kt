@@ -11,7 +11,7 @@ class CustomPlaylist(
     companion object {
         private var total: Int = -1
 
-        fun createListOfPlaylists(offset: Int = 0, limit: Int = 20): ArrayList<CustomPlaylist> {
+        fun getAllPlaylistsFromApi(offset: Int = 0, limit: Int = 20): ArrayList<CustomPlaylist> {
             val playlists = ArrayList<CustomPlaylist>()
             val apiResponse = PlaylistManager.getListOfPlaylists(offset, limit)
             if (apiResponse?.statusCode == 200) {

@@ -93,7 +93,7 @@ class TracksAdapter (
         // TODO: Añadir "Cargando" o algo por el estilo
         val oldItemCount = itemCount
         thread {
-            val newTracks = CustomTrack.createListOfTracks(playlistId, oldItemCount)
+            val newTracks = CustomTrack.getTracksFromApi(playlistId, oldItemCount)
             activity.runOnUiThread {
                 mTracks.addAll(newTracks)
                 this.notifyItemRangeInserted(oldItemCount, itemCount)

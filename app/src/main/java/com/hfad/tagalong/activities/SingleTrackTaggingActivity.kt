@@ -15,40 +15,68 @@ import com.squareup.picasso.Picasso
 import kotlin.concurrent.thread
 
 class SingleTrackTaggingActivity : AppCompatActivity() {
-    private lateinit var currentTrack: CustomTrack
-    private lateinit var adapter: TagViewAdapter
+    private lateinit var trackImageView: ImageView
+    private lateinit var trackNameTextView: TextView
+    private lateinit var trackInfoTextView: TextView
+    private lateinit var tagManagerView: CustomTagManagerForSingleTrackView
+
+    private lateinit var track: CustomTrack
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_single_track_tagging)
+        initializeUI()
+    }
 
+    private fun initializeUI() {
+        initializeTrack()
+        initializeImageView()
+        initializeTrackNameTextView()
+        initializeTrackInfoTextView()
+        initializeTagManagerView()
+    }
+
+    private fun initializeTrack() {
         val trackData = intent.getStringExtra(Extras.TRACK_DATA)
-        currentTrack = Gson().fromJson(trackData, CustomTrack::class.java)
+        track = Gson().fromJson(trackData, CustomTrack::class.java)
+    }
 
-        val imageView = findViewById<ImageView>(R.id.track_image)
-        currentTrack.imageUrl?.let { Picasso.get().load(it).into(imageView) }
+    private fun initializeImageView() {
+        trackImageView = findViewById(R.id.track_image)
+        track.imageUrl?.let { Picasso.get().load(it).into(trackImageView) }
+    }
 
-        val nameTextView = findViewById<TextView>(R.id.track_name_tv)
-        nameTextView.text = currentTrack.name
-        nameTextView.ellipsize = TextUtils.TruncateAt.END
+    private fun initializeTrackNameTextView() {
+        trackNameTextView = findViewById(R.id.track_name_tv)
+        trackNameTextView.text = track.name
+        trackNameTextView.ellipsize = TextUtils.TruncateAt.END
+    }
 
-        val infoTextView = findViewById<TextView>(R.id.track_info_tv)
-        infoTextView.text = resources.getString(R.string.track_info, if (currentTrack.artists.isNotEmpty()) currentTrack.artists[0] else "null", currentTrack.album)
-        nameTextView.ellipsize = TextUtils.TruncateAt.END
+    private fun initializeTrackInfoTextView() {
+        trackInfoTextView = findViewById<TextView>(R.id.track_info_tv)
+        trackInfoTextView.text = resources.getString(
+            R.string.track_info,
+            if (track.artists.isNotEmpty()) track.artists[0] else "null",
+            track.album
+        )
+        trackInfoTextView.ellipsize = TextUtils.TruncateAt.END
+    }
 
-        val tagManagerView = findViewById<CustomTagManagerForSingleTrackView>(R.id.single_track_tag_manager)
-        tagManagerView.apply {
-            track = currentTrack
-            thread {
-                // Initialize current tags
-                val dbHelper = DBHelper(context)
-                val currentTags = dbHelper.selectTagNamesBySongId(track.id)
-                val allTags = dbHelper.selectAllTags()
-                runOnUiThread {
-                    tagList = currentTags
-                    autoCompleteTagList = allTags
-                }
-                dbHelper.close()
+    private fun initializeTagManagerView() {
+        tagManagerView = findViewById(R.id.single_track_tag_manager)
+        tagManagerView.track = this.track
+        populateTagManagerView()
+    }
+
+    private fun populateTagManagerView() {
+        thread {
+            val dbHelper = DBHelper(this)
+            val currentTags = dbHelper.selectTagNamesBySongId(track.id)
+            val allTags = dbHelper.selectAllTags()
+            dbHelper.close()
+            runOnUiThread {
+                tagManagerView.tagList = currentTags
+                tagManagerView.autoCompleteTagList = allTags
             }
         }
     }
