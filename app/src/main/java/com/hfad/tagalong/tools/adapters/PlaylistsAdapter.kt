@@ -1,5 +1,6 @@
 package com.hfad.tagalong.tools.adapters
 
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -18,31 +19,66 @@ import kotlin.concurrent.thread
 // Source: https://guides.codepath.com/android/using-the-recyclerview
 class PlaylistsAdapter (
     private val activity: FragmentActivity,
-    private val mPlaylists: ArrayList<CustomPlaylist>
-    ) : RecyclerView.Adapter<PlaylistsAdapter.ViewHolder>() {
+    private val playlists: ArrayList<CustomPlaylist>
+) : RecyclerView.Adapter<PlaylistsAdapter.ViewHolder>() {
 
-    inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView), View.OnClickListener {
+    inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
         val nameTextView = itemView.findViewById<TextView>(R.id.playlist_name_tv)
         val sizeTextView = itemView.findViewById<TextView>(R.id.playlist_size_tv)
         val imageView = itemView.findViewById<ImageView>(R.id.playlist_image)
-        private var playlist: CustomPlaylist? = null
+
+        private lateinit var context: Context
+
+        private lateinit var playlist: CustomPlaylist
 
         init {
-            listItemView.setOnClickListener(this)
+            listItemView.setOnClickListener {
+                onClickListItemView(it)
+            }
         }
 
-        override fun onClick(listItemView: View) {
-            val context = listItemView.context
-            context.startActivity(Intent(
-                context,
-                TrackListActivity::class.java
-            ).apply {
-                putExtra(Extras.PLAYLIST_ID, playlist?.id)
-            })
+        private fun onClickListItemView(listItemView: View) {
+            context = listItemView.context
+            startTrackListActivity()
+        }
+
+        private fun startTrackListActivity() {
+            val trackListIntent = Intent(context, TrackListActivity::class.java).apply {
+                putExtra(Extras.PLAYLIST_ID, playlist.id)
+            }
+            context.startActivity(trackListIntent)
         }
 
         fun bindPlaylist(playlist: CustomPlaylist) {
             this.playlist = playlist
+            populate()
+        }
+
+        private fun populate() {
+            populateNameTextView()
+            populateSizeTextView()
+            populateImageView()
+        }
+
+        private fun populateNameTextView() {
+            nameTextView.text = playlist.name
+        }
+
+        private fun populateSizeTextView() {
+            sizeTextView.text = sizeTextView.context.resources.getQuantityString(
+                R.plurals.playlist_size,
+                playlist.size,
+                playlist.size
+            )
+        }
+
+        private fun populateImageView() {
+            if (playlist.imageUrl !== null) {
+                // TODO: Make image square
+                Picasso.get().load(playlist.imageUrl).into(imageView)
+            } else {
+                imageView.setImageDrawable(null)
+            }
         }
     }
 
@@ -54,50 +90,44 @@ class PlaylistsAdapter (
     }
 
     override fun onBindViewHolder(viewHolder: PlaylistsAdapter.ViewHolder, position: Int) {
-        if (itemCount < CustomPlaylist.getTotalPlaylists() && position == itemCount-1) {
-            makeLoadingTextVisible(true)
-            getMorePlaylists()
-            thread {
-                Thread.sleep(500)
-                activity.runOnUiThread {
-                    makeLoadingTextVisible(false)
-                }
+        if (areThereMorePlaylistsToLoad() && isLastItem(position)) {
+            loadMorePlaylists()
+        }
+        viewHolder.bindPlaylist(playlists[position])
+    }
+
+    private fun areThereMorePlaylistsToLoad() = itemCount < CustomPlaylist.getTotalPlaylists()
+
+    private fun isLastItem(position: Int) = position == itemCount - 1
+
+    private fun loadMorePlaylists() {
+        setLoadingTextVisibility(true)
+        getAndAddMorePlaylists()
+        thread {
+            Thread.sleep(500)
+            activity.runOnUiThread {
+                setLoadingTextVisibility(false)
             }
         }
-        val playlist: CustomPlaylist = mPlaylists[position]
-        viewHolder.bindPlaylist(playlist)
-        val nameTextView = viewHolder.nameTextView
-        nameTextView.text = playlist.name
-        val sizeTextView = viewHolder.sizeTextView
-        sizeTextView.text = sizeTextView.context.resources.getQuantityString(R.plurals.playlist_size, playlist.size, playlist.size)
-        val imageView = viewHolder.imageView
-        if (playlist.imageUrl !== null) {
-            // TODO: Make image square
-            Picasso.get().load(playlist.imageUrl).into(imageView)
-        } else {
-            imageView.setImageDrawable(null)
-        }
     }
 
-    override fun getItemCount(): Int {
-        return mPlaylists.size
+    private fun setLoadingTextVisibility(visible: Boolean = true) {
+        val loadingTextView = activity.findViewById<TextView>(R.id.loading_tv)
+        loadingTextView.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
 
-    private fun getMorePlaylists() {
-        // TODO: Añadir "Cargando" o algo por el estilo
-        val oldItemCount = itemCount
+    private fun getAndAddMorePlaylists() {
         thread {
+            val oldItemCount = itemCount
             val newPlaylists = CustomPlaylist.getAllPlaylistsFromApi(oldItemCount)
             activity.runOnUiThread {
-                mPlaylists.addAll(newPlaylists)
+                playlists.addAll(newPlaylists)
                 this.notifyItemRangeInserted(oldItemCount, itemCount)
             }
         }
     }
 
-    private fun makeLoadingTextVisible(visible: Boolean = true) {
-        val loadingTextView = activity.findViewById<TextView>(R.id.loading_tv)
-        loadingTextView.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+    override fun getItemCount(): Int {
+        return playlists.size
     }
-
 }

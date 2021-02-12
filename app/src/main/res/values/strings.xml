@@ -13,9 +13,6 @@
     <string name="repeatedTagName">This song already has that tag</string>
     <string name="loading_text">Loading...</string>
     <string name="delete_tag_icon_description">Delete tag icon</string>
-    <string name="playlists_tab_name">Playlists</string>
-    <string name="tags_tab_name">Tags</string>
-    <string name="manager_tab_name">Manager</string>
     <string name="create_playlist_button_text">Create</string>
     <string name="create_playlist_top_text">Choose the tags that will be used to create the playlist:</string>
     <string name="create_playlist_bottom_text_pre_spinner">Songs with</string>
@@ -25,4 +22,12 @@
         <item>ANY</item>
     </string-array>
     <string name="login_button_text">Login with Spotify</string>
+    <string-array name="tabTitles">
+        <item>Playlists</item>
+        <item>Tags</item>
+        <item>Manager</item>
+    </string-array>
+    <string name="playlists_tab_name">Playlists</string>
+    <string name="tags_tab_name">Tags</string>
+    <string name="manager_tab_name">Manager</string>
 </resources>
