@@ -8,7 +8,6 @@ import com.google.gson.Gson
 import com.hfad.tagalong.R
 import com.hfad.tagalong.config.Extras
 import com.hfad.tagalong.tools.DBHelper
-import com.hfad.tagalong.tools.adapters.TagViewAdapter
 import com.hfad.tagalong.types.CustomTrack
 import com.hfad.tagalong.views.CustomTagManagerForSingleTrackView
 import com.squareup.picasso.Picasso

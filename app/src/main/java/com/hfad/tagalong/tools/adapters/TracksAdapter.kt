@@ -1,6 +1,7 @@
 package com.hfad.tagalong.tools.adapters
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -17,16 +18,20 @@ import com.squareup.picasso.Picasso
 import kotlin.concurrent.thread
 
 // Source: https://guides.codepath.com/android/using-the-recyclerview
-class TracksAdapter (
+class TracksAdapter(
     private val activity: Activity,
     private val mTracks: ArrayList<CustomTrack>,
     private val playlistId: String?
-    ) : RecyclerView.Adapter<TracksAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<TracksAdapter.ViewHolder>() {
 
-    inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView), View.OnClickListener {
+    inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView),
+        View.OnClickListener {
         val nameTextView = itemView.findViewById<TextView>(R.id.track_name_tv)
         val infoTextView = itemView.findViewById<TextView>(R.id.track_info_tv)
         val imageView = itemView.findViewById<ImageView>(R.id.track_image)
+
+        private lateinit var context: Context
+
         private lateinit var track: CustomTrack
 
         init {
@@ -34,18 +39,48 @@ class TracksAdapter (
         }
 
         override fun onClick(listItemView: View) {
-            val context = listItemView.context
+            context = listItemView.context
+            startSingleTrackTaggingActivity()
+        }
+
+        private fun startSingleTrackTaggingActivity() {
             val trackData = Gson().toJson(track)
-            context.startActivity(Intent(
-                context,
-                SingleTrackTaggingActivity::class.java
-            ).apply {
-                putExtra(Extras.TRACK_DATA, trackData)
-            })
+            val singleTrackTaggingIntent = Intent(context, SingleTrackTaggingActivity::class.java)
+                .apply { putExtra(Extras.TRACK_DATA, trackData) }
+            context.startActivity(singleTrackTaggingIntent)
         }
 
         fun bindTrack(track: CustomTrack) {
             this.track = track
+            populate(track)
+        }
+
+        fun populate(track: CustomTrack) {
+            populateNameTextView(track)
+            populateInfoTextView(track)
+            populateImageView(track)
+        }
+
+        private fun populateNameTextView(track: CustomTrack) {
+            nameTextView.text = track.name
+        }
+
+        private fun populateInfoTextView(track: CustomTrack) {
+            // TODO: Handle more than one artist
+            infoTextView.text = context.resources.getString(
+                R.string.track_info,
+                if (track.artists.isNotEmpty()) track.artists[0] else "null",
+                track.album
+            )
+        }
+
+        fun populateImageView(track: CustomTrack) {
+            if (track.imageUrl !== null) {
+                // TODO: Make image square
+                Picasso.get().load(track.imageUrl).into(imageView)
+            } else {
+                imageView.setImageDrawable(null)
+            }
         }
     }
 
@@ -57,40 +92,39 @@ class TracksAdapter (
     }
 
     override fun onBindViewHolder(viewHolder: TracksAdapter.ViewHolder, position: Int) {
-        playlistId?.let {
-            if (itemCount < CustomTrack.getTotalTracksForPlaylistId(playlistId) && position == itemCount - 1) {
-                makeLoadingTextVisible(true)
-                getMoreTracks(playlistId)
-                thread {
-                    Thread.sleep(500)
-                    activity.runOnUiThread {
-                        makeLoadingTextVisible(false)
-                    }
-                }
-            }
+        if (playlistId != null && areThereMoreTracksToLoad() && isLastItem(position)) {
+            loadMoreTracks()
         }
-        val track: CustomTrack = mTracks[position]
-        viewHolder.bindTrack(track)
-        val textView = viewHolder.nameTextView
-        textView.text = track.name
-        val infoView = viewHolder.infoTextView
-        // TODO: Handle more than one artist
-        infoView.text = infoView.context.resources.getString(R.string.track_info, if (track.artists.isNotEmpty()) track.artists[0] else "null", track.album)
-        val imageView = viewHolder.imageView
-        if (track.imageUrl !== null) {
-            // TODO: Make image square
-            Picasso.get().load(track.imageUrl).into(imageView)
-        } else {
-            imageView.setImageDrawable(null)
+        viewHolder.bindTrack(mTracks[position])
+    }
+
+    private fun areThereMoreTracksToLoad(): Boolean {
+        return playlistId == null ||
+            itemCount < CustomTrack.getTotalTracksForPlaylistId(playlistId)
+    }
+
+    private fun isLastItem(position: Int) = position == itemCount-1
+
+    private fun loadMoreTracks() {
+        if (playlistId == null) {
+            return
+        }
+        setLoadingTextVisibility(true)
+        getMoreTracks(playlistId)
+        thread {
+            Thread.sleep(500)
+            activity.runOnUiThread {
+                setLoadingTextVisibility(false)
+            }
         }
     }
 
-    override fun getItemCount(): Int {
-        return mTracks.size
+    private fun setLoadingTextVisibility(visible: Boolean = true) {
+        val loadingTextView = activity.findViewById<TextView>(R.id.loading_tv)
+        loadingTextView.visibility = if (visible) View.VISIBLE else View.INVISIBLE
     }
 
     private fun getMoreTracks(playlistId: String) {
-        // TODO: Añadir "Cargando" o algo por el estilo
         val oldItemCount = itemCount
         thread {
             val newTracks = CustomTrack.getTracksFromApi(playlistId, oldItemCount)
@@ -101,9 +135,7 @@ class TracksAdapter (
         }
     }
 
-    private fun makeLoadingTextVisible(visible: Boolean = true) {
-        val loadingTextView = activity.findViewById<TextView>(R.id.loading_tv)
-        loadingTextView.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+    override fun getItemCount(): Int {
+        return mTracks.size
     }
-
 }
