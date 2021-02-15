@@ -9,13 +9,13 @@ import okhttp3.Request
 
 object UserManager {
     private val client = OkHttpClient()
-    private var USER_PROFILE: UserProfile? = null
+    private lateinit var USER_PROFILE: UserProfile
 
-    fun getUserID(): String? {
-        if (USER_PROFILE == null) {
+    fun getUserID(): String {
+        if (!this::USER_PROFILE.isInitialized) {
             getUserProfile()
         }
-        return USER_PROFILE?.id
+        return USER_PROFILE.id
     }
 
     private fun getUserProfile() {

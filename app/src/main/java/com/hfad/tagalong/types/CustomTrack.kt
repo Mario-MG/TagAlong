@@ -15,8 +15,8 @@ data class CustomTrack(
         fun getTracksFromApi(playlistId: String, offset: Int = 0, limit: Int = 100): ArrayList<CustomTrack> {
             val tracks = ArrayList<CustomTrack>()
             val apiResponse = PlaylistManager.getPlaylistTracks(playlistId, offset, limit)
-            if (apiResponse?.statusCode == 200) {
-                apiResponse.result?.items?.forEach { item ->
+            if (apiResponse.success) {
+                apiResponse.result!!.items.forEach { item ->
                     val artists = item.track?.artists?.map { artist -> artist.name }
                     tracks.add(CustomTrack(
                         item.track?.id ?: "null",
@@ -26,7 +26,7 @@ data class CustomTrack(
                         item.track?.album?.images?.let { if (it.isNotEmpty()) it[0].url else null }
                     ))
                 }
-                totalTracksByPlaylistId.put(playlistId, apiResponse.result?.total ?: -1)
+                totalTracksByPlaylistId[playlistId] = apiResponse.result.total
             }
             return tracks
         }

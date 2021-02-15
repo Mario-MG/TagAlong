@@ -14,8 +14,8 @@ class CustomPlaylist(
         fun getAllPlaylistsFromApi(offset: Int = 0, limit: Int = 20): ArrayList<CustomPlaylist> {
             val playlists = ArrayList<CustomPlaylist>()
             val apiResponse = PlaylistManager.getListOfPlaylists(offset, limit)
-            if (apiResponse?.statusCode == 200) {
-                apiResponse.result?.items?.forEach { item ->
+            if (apiResponse.success) {
+                apiResponse.result!!.items.forEach { item ->
                     playlists.add(CustomPlaylist(
                         item.id,
                         item.name,
@@ -23,7 +23,7 @@ class CustomPlaylist(
                         item.images.let { if (it.isNotEmpty()) it[0].url else null }
                     ))
                 }
-                total = apiResponse.result?.total ?: -1
+                total = apiResponse.result.total
             }
             return playlists
         }

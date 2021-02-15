@@ -28,21 +28,49 @@ class URLBuilder {
         return this
     }
 
+    fun replace(key: String, value: Any): URLBuilder {
+        toReplace[key] = value.toString()
+        return this
+    }
+
     fun param(key: String, value: String): URLBuilder {
         params[key] = value
         return this
     }
 
+    fun param(key: String, value: Any): URLBuilder {
+        params[key] = value.toString()
+        return this
+    }
+
     fun build(): String {
         var url = host + endpoint
-        toReplace.forEach { (key, value) ->
-            url = url.replace("{${key}}", value)
+        url = replaceVariables(url)
+        url = addParameters(url)
+        return url
+    }
+
+    private fun replaceVariables(url: String): String {
+        if (toReplace.isEmpty()) {
+            return url
         }
+        var newUrl = url
+        toReplace.forEach { (key, value) ->
+            newUrl = newUrl.replace("{${key}}", value)
+        }
+        return newUrl
+    }
+
+    private fun addParameters(url: String): String {
+        if (params.isEmpty()) {
+            return url
+        }
+        var newUrl = url
         val paramsList = ArrayList<String>()
         params.forEach { (key, value) ->
             paramsList.add("$key=$value")
         }
-        url += paramsList.joinToString("&")
-        return url
+        newUrl += paramsList.joinToString("&", "?")
+        return newUrl
     }
 }
