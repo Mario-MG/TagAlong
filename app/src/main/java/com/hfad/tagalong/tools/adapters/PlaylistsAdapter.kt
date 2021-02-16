@@ -27,18 +27,17 @@ class PlaylistsAdapter (
         val sizeTextView = itemView.findViewById<TextView>(R.id.playlist_size_tv)
         val imageView = itemView.findViewById<ImageView>(R.id.playlist_image)
 
-        private lateinit var context: Context
+        private val context = listItemView.context
 
         private lateinit var playlist: CustomPlaylist
 
         init {
             listItemView.setOnClickListener {
-                onClickListItemView(it)
+                onClickListItemView()
             }
         }
 
-        private fun onClickListItemView(listItemView: View) {
-            context = listItemView.context
+        private fun onClickListItemView() {
             startTrackListActivity()
         }
 

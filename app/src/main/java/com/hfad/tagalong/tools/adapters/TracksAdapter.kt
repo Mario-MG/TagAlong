@@ -24,22 +24,22 @@ class TracksAdapter(
     private val playlistId: String?
 ) : RecyclerView.Adapter<TracksAdapter.ViewHolder>() {
 
-    inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView),
-        View.OnClickListener {
+    inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
         val nameTextView = itemView.findViewById<TextView>(R.id.track_name_tv)
         val infoTextView = itemView.findViewById<TextView>(R.id.track_info_tv)
         val imageView = itemView.findViewById<ImageView>(R.id.track_image)
 
-        private lateinit var context: Context
+        private val context = listItemView.context
 
         private lateinit var track: CustomTrack
 
         init {
-            listItemView.setOnClickListener(this)
+            listItemView.setOnClickListener {
+                onClickViewHolder()
+            }
         }
 
-        override fun onClick(listItemView: View) {
-            context = listItemView.context
+        private fun onClickViewHolder() {
             startSingleTrackTaggingActivity()
         }
 
@@ -55,7 +55,7 @@ class TracksAdapter(
             populate(track)
         }
 
-        fun populate(track: CustomTrack) {
+        private fun populate(track: CustomTrack) {
             populateNameTextView(track)
             populateInfoTextView(track)
             populateImageView(track)
@@ -74,7 +74,7 @@ class TracksAdapter(
             )
         }
 
-        fun populateImageView(track: CustomTrack) {
+        private fun populateImageView(track: CustomTrack) {
             if (track.imageUrl !== null) {
                 // TODO: Make image square
                 Picasso.get().load(track.imageUrl).into(imageView)
