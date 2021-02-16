@@ -1,5 +1,6 @@
 package com.hfad.tagalong.tools.adapters
 
+import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -15,24 +16,34 @@ class TagsAdapter (private val mTags: List<String>) : RecyclerView.Adapter<TagsA
 
     inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView), View.OnClickListener {
         val nameTextView = itemView.findViewById<TextView>(R.id.tag_name_tv)
-        private var tag: String? = null
+
+        private lateinit var context: Context
+
+        private lateinit var tag: String
 
         init {
             listItemView.setOnClickListener(this)
         }
 
         override fun onClick(listItemView: View) {
-            val context = listItemView.context
-            context.startActivity(Intent(
-                context,
-                TrackListActivity::class.java
-            ).apply {
+            context = listItemView.context
+            startTrackListActivity()
+        }
+
+        private fun startTrackListActivity() {
+            val trackListIntent = Intent(context, TrackListActivity::class.java).apply {
                 putExtra(Extras.TAG_NAME, tag)
-            })
+            }
+            context.startActivity(trackListIntent)
         }
 
         fun bindPlaylist(tag: String) {
             this.tag = tag
+            populate()
+        }
+
+        private fun populate() {
+            nameTextView.text = tag
         }
     }
 
@@ -46,8 +57,6 @@ class TagsAdapter (private val mTags: List<String>) : RecyclerView.Adapter<TagsA
     override fun onBindViewHolder(viewHolder: TagsAdapter.ViewHolder, position: Int) {
         val tag: String = mTags[position]
         viewHolder.bindPlaylist(tag)
-        val nameTextView = viewHolder.nameTextView
-        nameTextView.text = tag
     }
 
     override fun getItemCount(): Int {

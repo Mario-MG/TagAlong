@@ -5,7 +5,7 @@ data class ApiResponse<T> (
     val result: T?
 ) {
     val success: Boolean
-        get() = SUCCESS_STATUS_CODES.indexOf(statusCode) != -1
+        get() = SUCCESS_STATUS_CODES.contains(statusCode)
 
 
     private companion object {

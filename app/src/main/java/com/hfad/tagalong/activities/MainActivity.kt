@@ -39,12 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializeViewPager() {
         viewPager = findViewById(R.id.view_pager)
-        val tabTitles = arrayOf(
-            getString(R.string.playlists_tab_name),
-            getString(R.string.tags_tab_name),
-            getString(R.string.manager_tab_name)
-        )
-        viewPagerAdapter = MainFragmentPagerAdapter(supportFragmentManager, tabTitles)
+        viewPagerAdapter = MainFragmentPagerAdapter(supportFragmentManager, this)
         viewPager.adapter = viewPagerAdapter
     }
 

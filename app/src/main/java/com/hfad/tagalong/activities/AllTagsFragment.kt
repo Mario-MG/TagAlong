@@ -1,10 +1,12 @@
 package com.hfad.tagalong.activities
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
@@ -13,8 +15,15 @@ import com.hfad.tagalong.tools.adapters.TagsAdapter
 import kotlin.concurrent.thread
 
 class AllTagsFragment : Fragment() {
+    private lateinit var mActivity: FragmentActivity
+
     private lateinit var tags: ArrayList<String>
-    private lateinit var rvTags: RecyclerView
+    private lateinit var tagsRecyclerView: RecyclerView
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mActivity = context as FragmentActivity
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,27 +35,36 @@ class AllTagsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        rvTags = view.findViewById(R.id.rvPlaylists)
+        initializeTagsRecyclerView(view)
+    }
+
+    private fun initializeTagsRecyclerView(view: View) {
+        tagsRecyclerView = view.findViewById(R.id.playlists_recyclerview)
     }
 
     override fun onResume() {
         super.onResume()
+        populateTagsRecyclerView()
+    }
 
-        activity?.let {
-            val dbHelper = DBHelper(it)
-            thread {
-                // Initialize playlists
-                tags = dbHelper.selectAllTags()
-                // Create Adapter passing in the playlists
-                val adapter = TagsAdapter(tags)
-                activity?.runOnUiThread {
-                    // Attach the Adapter to the RecyclerView to populate items
-                    rvTags.adapter = adapter
-                    // Set layout manager to position the items
-                    rvTags.layoutManager = LinearLayoutManager(activity)
-                }
-                dbHelper.close()
-            }
+    private fun populateTagsRecyclerView() {
+        thread {
+            getAllTagsFromDb()
+            setTagsIntoRecyclerView()
+        }
+    }
+
+    private fun getAllTagsFromDb() {
+        val dbHelper = DBHelper(mActivity)
+        tags = dbHelper.selectAllTags()
+        dbHelper.close()
+    }
+
+    private fun setTagsIntoRecyclerView() {
+        val adapter = TagsAdapter(tags)
+        mActivity.runOnUiThread {
+            tagsRecyclerView.adapter = adapter
+            tagsRecyclerView.layoutManager = LinearLayoutManager(activity)
         }
     }
 }
