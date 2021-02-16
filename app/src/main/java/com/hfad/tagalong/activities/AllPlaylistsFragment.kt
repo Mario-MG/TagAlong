@@ -50,7 +50,7 @@ class AllPlaylistsFragment : Fragment() {
 
     private fun populatePlaylistsRecyclerView() {
         thread {
-            playlists = CustomPlaylist.getAllPlaylistsFromApi()
+            playlists = CustomPlaylist.getAllPlaylistsFromApi() as ArrayList<CustomPlaylist>
             setPlaylistsIntoRecyclerView()
         }
     }
