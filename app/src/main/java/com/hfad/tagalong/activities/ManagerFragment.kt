@@ -11,19 +11,26 @@ import android.widget.Button
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
 import com.hfad.tagalong.tools.DBHelper
+import com.hfad.tagalong.tools.adapters.PlaylistCreatorAdapter
 import com.hfad.tagalong.tools.api.PlaylistManager
-import com.hfad.tagalong.views.CustomTagManagerForPlaylistCreationView
+import com.hfad.tagalong.types.PlaylistCreationRule
+import com.hfad.tagalong.views.TagManagerForPlaylistCreationView
 import kotlin.concurrent.thread
 
 class ManagerFragment : Fragment() {
     private lateinit var mActivity: FragmentActivity
     private lateinit var mDbHelper: DBHelper
 
-    private lateinit var tagManagerView: CustomTagManagerForPlaylistCreationView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var tagManagerView: TagManagerForPlaylistCreationView
     private lateinit var createPlaylistButton: Button
     private lateinit var spinner: Spinner
+
+    private lateinit var rules: ArrayList<PlaylistCreationRule>
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -44,13 +51,36 @@ class ManagerFragment : Fragment() {
     }
 
     private fun initializeFragment() {
-        initializeTagManagerView()
-        initializeSpinner()
-        initializeCreatePlaylistButton()
+        initializeRecyclerView()
+        populateRecyclerView()
+//        initializeTagManagerView()
+//        initializeSpinner()
+//        initializeCreatePlaylistButton()
+    }
+
+    private fun initializeRecyclerView() {
+        recyclerView = mActivity.findViewById(R.id.playlist_creator_recyclerview)
+    }
+
+    private fun populateRecyclerView() {
+        thread {
+            mDbHelper = DBHelper(mActivity)
+            rules = mDbHelper.selectAllRulesWithTags()
+            mDbHelper.close()
+            setRulesIntoRecyclerView()
+        }
+    }
+
+    private fun setRulesIntoRecyclerView() {
+        val adapter = PlaylistCreatorAdapter(mActivity, rules)
+        mActivity.runOnUiThread {
+            recyclerView.adapter = adapter
+            recyclerView.layoutManager = LinearLayoutManager(activity)
+        }
     }
 
     private fun initializeTagManagerView() {
-        tagManagerView = mActivity.findViewById(R.id.tag_manager_for_playlist_creation)
+        tagManagerView = mActivity.findViewById(R.id.tag_manager_rule)
         thread {
             initializeAutoCompleteTagList()
         }
@@ -108,19 +138,19 @@ class ManagerFragment : Fragment() {
         return songIds
     }
 
-    private fun createAndPopulatePlaylist(songIds: List<String>) {
-        val playlistCreatedResponse = PlaylistManager.createPlaylist("TagAlong Playlist")
-        if (playlistCreatedResponse?.success == true) {
-            val playlistId = playlistCreatedResponse.result!!.id
-            populatePlaylistAndShowToast(playlistId, songIds)
-        }
-    }
-
     private fun selectSongIdsWithSelectedTags(selectedTags: ArrayList<String>): List<String> {
         return when (spinner.selectedItemPosition) {
             0 -> mDbHelper.selectSongIdsWithAllTags(*selectedTags.toTypedArray())
             1 -> mDbHelper.selectSongIdsWithAnyTags(*selectedTags.toTypedArray())
             else -> emptyList()
+        }
+    }
+
+    private fun createAndPopulatePlaylist(songIds: List<String>) {
+        val playlistCreatedResponse = PlaylistManager.createPlaylist("TagAlong Playlist")
+        if (playlistCreatedResponse.success) {
+            val playlistId = playlistCreatedResponse.result!!.id
+            populatePlaylistAndShowToast(playlistId, songIds)
         }
     }
 

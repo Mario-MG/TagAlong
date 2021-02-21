@@ -12,7 +12,7 @@ import com.hfad.tagmanagerview.TagManagerView
 import java.util.*
 import kotlin.concurrent.thread
 
-class CustomTagManagerForSingleTrackView @JvmOverloads constructor(
+class TagManagerForSingleTrackView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,

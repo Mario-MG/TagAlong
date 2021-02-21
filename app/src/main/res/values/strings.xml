@@ -30,4 +30,8 @@
     <string name="playlists_tab_name">Playlists</string>
     <string name="tags_tab_name">Tags</string>
     <string name="manager_tab_name">Manager</string>
+    <string name="default_new_playlist_name">New TagAlong Playlist</string>
+    <string name="auto_update">Auto-update</string>
+    <string name="pre_spinner_text">Add songs with</string>
+    <string name="post_spinner_text">of the tags</string>
 </resources>

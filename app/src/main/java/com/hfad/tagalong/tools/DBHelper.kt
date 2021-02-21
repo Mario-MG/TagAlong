@@ -5,7 +5,9 @@ import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import com.hfad.tagalong.config.Optionality
 import com.hfad.tagalong.types.CustomTrack
+import com.hfad.tagalong.types.PlaylistCreationRule
 
 class DBHelper(context: Context)
     : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -15,10 +17,13 @@ class DBHelper(context: Context)
     override fun onCreate(db: SQLiteDatabase) {
         createTableSongs(db)
         createTableSongsTags(db)
+        createTableRules(db)
+        createTableRulesTags(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        TODO("Not yet implemented")
+        createTableRules(db)
+        createTableRulesTags(db)
     }
 
     fun selectAllTags(): ArrayList<String> {
@@ -163,17 +168,103 @@ class DBHelper(context: Context)
         // TODO: Borrar datos de Songs si ya no tiene más tags?
     }
 
+    fun selectAllRulesWithTags(): ArrayList<PlaylistCreationRule> {
+        val rulesTagsMap = selectAllRulesTags()
+        val rules = selectAllRulesAndAddTags(rulesTagsMap)
+        return rules
+    }
+
+    private fun selectAllRulesTags(): HashMap<Long, ArrayList<String>> {
+        val rulesTagsMap = HashMap<Long, ArrayList<String>>()
+        val cursor = readableDB.rawQuery(SQL_SELECT_ALL_RULES_TAGS, null)
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast) {
+                val ruleId = cursor.getLong(0)
+                if (!rulesTagsMap.containsKey(ruleId)) {
+                    rulesTagsMap[ruleId] = ArrayList()
+                }
+                val tag = cursor.getString(1)
+                rulesTagsMap[ruleId]!!.add(tag)
+                cursor.moveToNext()
+            }
+        }
+        cursor.close()
+        return rulesTagsMap
+    }
+
+    private fun selectAllRulesAndAddTags(rulesTagsMap: HashMap<Long, ArrayList<String>>): ArrayList<PlaylistCreationRule> {
+        val rules = ArrayList<PlaylistCreationRule>()
+        val cursor = readableDB.rawQuery(SQL_SELECT_ALL_RULES, null)
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast) {
+                val ruleId = cursor.getLong(0)
+                val playlistId = cursor.getString(1)
+                val optionalityInt = cursor.getInt(2)
+                val optionality = Optionality.values().find { op -> op.ordinal == optionalityInt }
+                val autoUpdateInt = cursor.getInt(3)
+                val autoUpdate = autoUpdateInt != 0
+                val rule = PlaylistCreationRule(
+                    ruleId,
+                    rulesTagsMap[ruleId] ?: emptyList<String>() as ArrayList<String>,
+                    playlistId,
+                    optionality ?: Optionality.ANY,
+                    autoUpdate
+                )
+                rules.add(rule)
+                cursor.moveToNext()
+            }
+        }
+        cursor.close()
+        return rules
+    }
+
+    fun insertRule(rule: PlaylistCreationRule): Long {
+        val ruleId = insertIntoRules(rule)
+        rule.ruleId = ruleId
+        insertIntoRulesTags(rule)
+        return ruleId
+    }
+
+    private fun insertIntoRules(rule: PlaylistCreationRule): Long {
+        val insertValues = ContentValues().apply {
+            put(PLAYLIST_ID, rule.playlistId)
+            put(OPTIONALITY, rule.optionality.value)
+            put(AUTO_UPDATE, rule.autoUpdate)
+        }
+        return writableDB.insert(TABLE_RULES, null, insertValues)
+    }
+
+    private fun insertIntoRulesTags(rule: PlaylistCreationRule) {
+        rule.tags.forEach { tag ->
+            val insertValues = ContentValues().apply {
+                put(RULE_ID, rule.ruleId)
+                put(TAG_NAME, tag)
+            }
+            writableDB.insert(TABLE_RULES_TAGS, null, insertValues)
+        }
+    }
+
+    private fun deleteRule(ruleId: Int) {
+        // TODO
+    }
+
     companion object {
-        const val DATABASE_VERSION = 1
+        const val DATABASE_VERSION = 2
         const val DATABASE_NAME = "tagalong.db"
         const val TABLE_SONGS = "Songs"
+        const val TABLE_SONGS_TAGS = "Songs_Tags"
+        const val TABLE_RULES = "Rules"
+        const val TABLE_RULES_TAGS = "Rules_Tags"
         const val SONG_ID = "song_id"
         const val SONG_NAME = "name"
         const val SONG_ALBUM = "album"
         const val SONG_ARTISTS = "artists"
         const val SONG_IMAGE_URL = "image_url"
-        const val TABLE_SONGS_TAGS = "Songs_Tags"
         const val TAG_NAME = "tag_name"
+        const val RULE_ID = "rule_id"
+        const val PLAYLIST_ID = "playlist_id"
+        const val OPTIONALITY = "optionality"
+        const val AUTO_UPDATE = "auto_update"
 
         private const val SQL_CREATE_SONGS =
             """
@@ -206,6 +297,28 @@ class DBHelper(context: Context)
                     $SONG_ID VARCHAR CONSTRAINT fk_songs_tags_song_id REFERENCES $TABLE_SONGS($SONG_ID),
                     $TAG_NAME VARCHAR,
                     CONSTRAINT pk_songs_tags PRIMARY KEY ($SONG_ID, $TAG_NAME)
+                )
+            """
+
+        private const val SQL_CREATE_RULES =
+            """
+                CREATE TABLE IF NOT EXISTS $TABLE_RULES (
+                    $RULE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    $PLAYLIST_ID VARCHAR NOT NULL,
+                    $OPTIONALITY BOOLEAN,
+                    $AUTO_UPDATE BOOLEAN
+                )
+            """
+
+        private const val SQL_CREATE_RULES_TAGS =
+            """
+                CREATE TABLE IF NOT EXISTS $TABLE_RULES_TAGS (
+                    $RULE_ID VARCHAR
+                        CONSTRAINT fk_rules_tags_rule_id
+                            REFERENCES $TABLE_RULES($RULE_ID)
+                            ON DELETE CASCADE,
+                    $TAG_NAME VARCHAR,
+                    CONSTRAINT pk_rules_tags PRIMARY KEY ($RULE_ID, $TAG_NAME)
                 )
             """
 
@@ -243,12 +356,30 @@ class DBHelper(context: Context)
                     WHERE $TAG_NAME = %s
             """
 
+        private const val SQL_SELECT_ALL_RULES =
+            """
+                SELECT * FROM $TABLE_RULES
+            """
+
+        private const val SQL_SELECT_ALL_RULES_TAGS =
+            """
+                SELECT * FROM $TABLE_RULES_TAGS
+            """
+
         fun createTableSongs(db: SQLiteDatabase) {
             db.execSQL(SQL_CREATE_SONGS)
         }
 
         fun createTableSongsTags(db: SQLiteDatabase) {
             db.execSQL(SQL_CREATE_SONGS_TAGS)
+        }
+
+        fun createTableRules(db: SQLiteDatabase) {
+            db.execSQL(SQL_CREATE_RULES)
+        }
+
+        fun createTableRulesTags(db: SQLiteDatabase) {
+            db.execSQL(SQL_CREATE_RULES_TAGS)
         }
     }
 }
