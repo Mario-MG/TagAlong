@@ -11,13 +11,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
 import com.hfad.tagalong.tools.api.PlaylistManager
 import com.hfad.tagalong.types.PlaylistCreationRule
+import com.hfad.tagalong.types.RuleObserver
+import com.hfad.tagalong.views.PlaylistRuleCreatorView
 import com.hfad.tagmanagerview.TagManagerView
 import kotlin.concurrent.thread
 
 class PlaylistCreatorAdapter(
     private val activity: FragmentActivity,
     private val playlistCreationRules: ArrayList<PlaylistCreationRule>
-) : RecyclerView.Adapter<PlaylistCreatorAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<PlaylistCreatorAdapter.ViewHolder>(), RuleObserver {
+    private lateinit var creatorView: PlaylistRuleCreatorView
 
     companion object {
         private const val RULE_CREATOR_VIEW_TYPE = 1
@@ -98,10 +101,20 @@ class PlaylistCreatorAdapter(
     override fun onBindViewHolder(viewHolder: PlaylistCreatorAdapter.ViewHolder, position: Int) {
         if (position < playlistCreationRules.size) {
             viewHolder.bindRule(playlistCreationRules[position])
+        } else {
+            creatorView = viewHolder.itemView.findViewById(R.id.playlist_rule_creator)
+            creatorView.subscribe(this)
         }
     }
 
     override fun getItemCount(): Int {
         return playlistCreationRules.size + 1
+    }
+
+    override fun onCreateRule(rule: PlaylistCreationRule) {
+        activity.runOnUiThread {
+            playlistCreationRules.add(rule)
+            notifyItemInserted(playlistCreationRules.size - 1)
+        }
     }
 }

@@ -53,9 +53,6 @@ class ManagerFragment : Fragment() {
     private fun initializeFragment() {
         initializeRecyclerView()
         populateRecyclerView()
-//        initializeTagManagerView()
-//        initializeSpinner()
-//        initializeCreatePlaylistButton()
     }
 
     private fun initializeRecyclerView() {
@@ -76,104 +73,6 @@ class ManagerFragment : Fragment() {
         mActivity.runOnUiThread {
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(activity)
-        }
-    }
-
-    private fun initializeTagManagerView() {
-        tagManagerView = mActivity.findViewById(R.id.tag_manager_rule)
-        thread {
-            initializeAutoCompleteTagList()
-        }
-    }
-
-    private fun initializeAutoCompleteTagList() {
-        val allTags = getAllTagsFromDb()
-        mActivity.runOnUiThread {
-            tagManagerView.autoCompleteTagList = allTags
-        }
-    }
-
-    private fun getAllTagsFromDb(): ArrayList<String> {
-        mDbHelper = DBHelper(mActivity)
-        val allTags = mDbHelper.selectAllTags()
-        mDbHelper.close()
-        return allTags
-    }
-
-    private fun initializeSpinner() {
-        spinner = mActivity.findViewById(R.id.create_playlist_spinner)
-        val adapter = ArrayAdapter.createFromResource(
-            mActivity,
-            R.array.create_playlist_spinner_entries,
-            R.layout.spinner_item
-        )
-        spinner.adapter = adapter
-    }
-
-    private fun initializeCreatePlaylistButton() {
-        createPlaylistButton = mActivity.findViewById(R.id.create_playlist_button)
-        createPlaylistButton.setOnClickListener {
-            onClickCreatePlaylistButton()
-        }
-    }
-
-    private fun onClickCreatePlaylistButton() {
-        val selectedTags = tagManagerView.tagList
-        thread {
-            createPlaylistWithSelectedTags(selectedTags)
-        }
-    }
-
-    private fun createPlaylistWithSelectedTags(selectedTags: ArrayList<String>) {
-        val songIds = getSongIdsForSelectedTagsFromDb(selectedTags)
-        if (songIds.isNotEmpty()) {
-            createAndPopulatePlaylist(songIds)
-        }
-    }
-
-    private fun getSongIdsForSelectedTagsFromDb(selectedTags: ArrayList<String>): List<String> {
-        mDbHelper = DBHelper(mActivity)
-        val songIds = selectSongIdsWithSelectedTags(selectedTags)
-        mDbHelper.close()
-        return songIds
-    }
-
-    private fun selectSongIdsWithSelectedTags(selectedTags: ArrayList<String>): List<String> {
-        return when (spinner.selectedItemPosition) {
-            0 -> mDbHelper.selectSongIdsWithAllTags(*selectedTags.toTypedArray())
-            1 -> mDbHelper.selectSongIdsWithAnyTags(*selectedTags.toTypedArray())
-            else -> emptyList()
-        }
-    }
-
-    private fun createAndPopulatePlaylist(songIds: List<String>) {
-        val playlistCreatedResponse = PlaylistManager.createPlaylist("TagAlong Playlist")
-        if (playlistCreatedResponse.success) {
-            val playlistId = playlistCreatedResponse.result!!.id
-            populatePlaylistAndShowToast(playlistId, songIds)
-        }
-    }
-
-    private fun populatePlaylistAndShowToast(
-        playlistId: String,
-        songIds: List<String>
-    ) {
-        val songsAddedToPlaylistResponse = PlaylistManager.addTracksToPlaylist(
-            playlistId,
-            *songIds.toTypedArray()
-        )
-        if (songsAddedToPlaylistResponse?.success == true) {
-            showSuccessToast()
-        }
-    }
-
-    private fun showSuccessToast() {
-        mActivity.runOnUiThread {
-            Toast.makeText(
-                mActivity,
-                "Playlist created successfully",
-                Toast.LENGTH_LONG
-            ).show()
         }
     }
 }

@@ -14,6 +14,8 @@ import com.hfad.tagalong.config.Optionality
 import com.hfad.tagalong.tools.DBHelper
 import com.hfad.tagalong.tools.api.PlaylistManager
 import com.hfad.tagalong.types.PlaylistCreationRule
+import com.hfad.tagalong.types.RuleObserver
+import com.hfad.tagalong.types.RuleSubject
 import com.hfad.tagmanagerview.TagManagerView
 import kotlin.concurrent.thread
 
@@ -22,7 +24,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr, defStyleRes) {
+) : ConstraintLayout(context, attrs, defStyleAttr, defStyleRes), RuleSubject {
     private val playlistNameEditText: EditText
     private val autoUpdateSwitch: SwitchCompat
     private val tagManager: TagManagerView
@@ -30,6 +32,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
     private val createPlaylistRuleButton: Button
 
     private lateinit var dbHelper: DBHelper
+    private val subscribers: HashSet<RuleObserver> = HashSet()
 
     lateinit var rule: PlaylistCreationRule
         private set
@@ -59,7 +62,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
         get() = optionalitySpinner.selectedItemPosition == Optionality.ANY.ordinal
         set(value) {
             field = value
-            optionalitySpinner.setSelection(Optionality.values().find { op -> op.value == field }!!.ordinal)
+            optionalitySpinner.setSelection(Optionality.forValue(field).ordinal)
         }
 
     init {
@@ -92,6 +95,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
             if (playlistId != null) {
                 createRuleWithPlaylistId(playlistId)
             }
+            notifyObservers(rule)
             resetFields()
         }
     }
@@ -144,7 +148,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
             null,
             tags,
             playlistId,
-            Optionality.values().find { op -> op.value == optionality }!!,
+            Optionality.forValue(optionality),
             autoUpdate
         )
         saveRuleToDB()
@@ -164,6 +168,20 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
             autoUpdate = true
             tags = ArrayList()
             optionality = false
+        }
+    }
+
+    override fun subscribe(observer: RuleObserver) {
+        subscribers.add(observer)
+    }
+
+    override fun unsubscribe(observer: RuleObserver) {
+        subscribers.remove(observer)
+    }
+
+    override fun notifyObservers(rule: PlaylistCreationRule) {
+        subscribers.forEach { observer ->
+            observer.onCreateRule(rule)
         }
     }
 }
