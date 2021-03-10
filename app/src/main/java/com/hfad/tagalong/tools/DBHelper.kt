@@ -70,6 +70,13 @@ class DBHelper(context: Context)
         return getStringArrayListFromSql(sql)
     }
 
+    private fun runSimpleSelect(
+        baseSql: String,
+        selectionArg: String
+    ): ArrayList<String> {
+        return runSimpleSelect(baseSql, arrayOf(selectionArg))
+    }
+
     private fun getStringArrayListFromSql(sql: String): ArrayList<String> {
         val stringArrayList = ArrayList<String>()
         val cursor = readableDB.rawQuery(sql, null)
@@ -248,23 +255,38 @@ class DBHelper(context: Context)
         // TODO
     }
 
+    fun selectPlaylistsToAddSongWithTag(songId: String, tagName: String): HashSet<String> {
+        val playlistsFulfillingAnyRule = selectPlaylistsFulfillingAnyRule(tagName)
+        val playlistsFulfillingAllRule = selectPlaylistsFulfillingAllRule(songId, tagName)
+        return (playlistsFulfillingAnyRule + playlistsFulfillingAllRule) as HashSet
+    }
+
+    private fun selectPlaylistsFulfillingAnyRule(tagName: String): Set<String> {
+        return runSimpleSelect(SQL_SELECT_PLAYLISTS_FOR_TAG_ANY, tagName).toSet()
+    }
+
+    private fun selectPlaylistsFulfillingAllRule(songId: String, tagName: String): Set<String> {
+        val tagNamesForSong = selectTagNamesBySongId(songId) + tagName
+        return runSimpleSelect(SQL_SELECT_PLAYLISTS_FOR_TAG_ALL, tagNamesForSong.toTypedArray()).toSet()
+    }
+
     companion object {
-        const val DATABASE_VERSION = 2
-        const val DATABASE_NAME = "tagalong.db"
-        const val TABLE_SONGS = "Songs"
-        const val TABLE_SONGS_TAGS = "Songs_Tags"
-        const val TABLE_RULES = "Rules"
-        const val TABLE_RULES_TAGS = "Rules_Tags"
-        const val SONG_ID = "song_id"
-        const val SONG_NAME = "name"
-        const val SONG_ALBUM = "album"
-        const val SONG_ARTISTS = "artists"
-        const val SONG_IMAGE_URL = "image_url"
-        const val TAG_NAME = "tag_name"
-        const val RULE_ID = "rule_id"
-        const val PLAYLIST_ID = "playlist_id"
-        const val OPTIONALITY = "optionality"
-        const val AUTO_UPDATE = "auto_update"
+        private const val DATABASE_VERSION = 2
+        private const val DATABASE_NAME = "tagalong.db"
+        private const val TABLE_SONGS = "Songs"
+        private const val TABLE_SONGS_TAGS = "Songs_Tags"
+        private const val TABLE_RULES = "Rules"
+        private const val TABLE_RULES_TAGS = "Rules_Tags"
+        private const val SONG_ID = "song_id"
+        private const val SONG_NAME = "name"
+        private const val SONG_ALBUM = "album"
+        private const val SONG_ARTISTS = "artists"
+        private const val SONG_IMAGE_URL = "image_url"
+        private const val TAG_NAME = "tag_name"
+        private const val RULE_ID = "rule_id"
+        private const val PLAYLIST_ID = "playlist_id"
+        private const val OPTIONALITY = "optionality"
+        private const val AUTO_UPDATE = "auto_update"
 
         private const val SQL_CREATE_SONGS =
             """
@@ -280,7 +302,8 @@ class DBHelper(context: Context)
         private const val SQL_SELECT_SONGS_BY_ID =
             """
                 SELECT $SONG_ID, $SONG_NAME, $SONG_ALBUM, $SONG_ARTISTS, $SONG_IMAGE_URL
-                    FROM $TABLE_SONGS WHERE $SONG_ID IN (?)
+                    FROM $TABLE_SONGS
+                    WHERE $SONG_ID IN (?)
             """
 
         private const val SQL_SELECT_SONGS_BY_TAG_NAME =
@@ -366,19 +389,40 @@ class DBHelper(context: Context)
                 SELECT * FROM $TABLE_RULES_TAGS
             """
 
-        fun createTableSongs(db: SQLiteDatabase) {
+        private const val SQL_SELECT_PLAYLISTS_FOR_TAG_ANY =
+            """
+                SELECT r.$PLAYLIST_ID FROM $TABLE_RULES r
+                    JOIN $TABLE_RULES_TAGS rt
+                        ON r.$RULE_ID = rt.$RULE_ID
+                    WHERE r.$AUTO_UPDATE = 1
+                        AND r.$OPTIONALITY = 1
+                        AND rt.$TAG_NAME = %s
+            """
+
+        private const val SQL_SELECT_PLAYLISTS_FOR_TAG_ALL =
+            """
+                SELECT $PLAYLIST_ID FROM $TABLE_RULES
+                    WHERE $AUTO_UPDATE = 1
+                        AND $OPTIONALITY = 0
+                        AND $RULE_ID NOT IN (
+                            SELECT DISTINCT $RULE_ID FROM $TABLE_RULES_TAGS
+                                WHERE $TAG_NAME NOT IN (%s)
+                            )
+            """ // TODO: Evitar duplicados cada vez que se añade una nueva etiqueta (comprobar si la nueva etiqueta forma parte de la regla)
+
+        private fun createTableSongs(db: SQLiteDatabase) {
             db.execSQL(SQL_CREATE_SONGS)
         }
 
-        fun createTableSongsTags(db: SQLiteDatabase) {
+        private fun createTableSongsTags(db: SQLiteDatabase) {
             db.execSQL(SQL_CREATE_SONGS_TAGS)
         }
 
-        fun createTableRules(db: SQLiteDatabase) {
+        private fun createTableRules(db: SQLiteDatabase) {
             db.execSQL(SQL_CREATE_RULES)
         }
 
-        fun createTableRulesTags(db: SQLiteDatabase) {
+        private fun createTableRulesTags(db: SQLiteDatabase) {
             db.execSQL(SQL_CREATE_RULES_TAGS)
         }
     }

@@ -52,7 +52,7 @@ class SingleTrackTaggingActivity : AppCompatActivity() {
     }
 
     private fun initializeTrackInfoTextView() {
-        trackInfoTextView = findViewById<TextView>(R.id.track_info_tv)
+        trackInfoTextView = findViewById(R.id.track_info_tv)
         trackInfoTextView.text = resources.getString(
             R.string.track_info,
             if (track.artists.isNotEmpty()) track.artists[0] else "null",
