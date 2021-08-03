@@ -19,6 +19,7 @@ class DBHelper(context: Context)
         createTableSongsTags(db)
         createTableRules(db)
         createTableRulesTags(db)
+        // TODO: Crear tabla para tags
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -287,6 +288,8 @@ class DBHelper(context: Context)
         private const val PLAYLIST_ID = "playlist_id"
         private const val OPTIONALITY = "optionality"
         private const val AUTO_UPDATE = "auto_update"
+
+        // TODO: Crear tabla para tags
 
         private const val SQL_CREATE_SONGS =
             """
