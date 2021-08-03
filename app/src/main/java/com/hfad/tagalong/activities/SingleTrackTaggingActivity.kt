@@ -9,7 +9,7 @@ import com.hfad.tagalong.R
 import com.hfad.tagalong.config.Extras
 import com.hfad.tagalong.tools.DBHelper
 import com.hfad.tagalong.types.CustomTrack
-import com.hfad.tagalong.views.CustomTagManagerForSingleTrackView
+import com.hfad.tagalong.views.TagManagerForSingleTrackView
 import com.squareup.picasso.Picasso
 import kotlin.concurrent.thread
 
@@ -17,7 +17,7 @@ class SingleTrackTaggingActivity : AppCompatActivity() {
     private lateinit var trackImageView: ImageView
     private lateinit var trackNameTextView: TextView
     private lateinit var trackInfoTextView: TextView
-    private lateinit var tagManagerView: CustomTagManagerForSingleTrackView
+    private lateinit var tagManagerView: TagManagerForSingleTrackView
 
     private lateinit var track: CustomTrack
 
@@ -52,7 +52,7 @@ class SingleTrackTaggingActivity : AppCompatActivity() {
     }
 
     private fun initializeTrackInfoTextView() {
-        trackInfoTextView = findViewById<TextView>(R.id.track_info_tv)
+        trackInfoTextView = findViewById(R.id.track_info_tv)
         trackInfoTextView.text = resources.getString(
             R.string.track_info,
             if (track.artists.isNotEmpty()) track.artists[0] else "null",

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/playlist_name_edittext"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="@string/default_new_playlist_name"
+        app:layout_constraintEnd_toStartOf="@+id/autoupdate_switch"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/autoupdate_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/auto_update"
+        app:layout_constraintBottom_toBottomOf="@+id/playlist_name_edittext"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.hfad.tagalong.views.TagManagerForPlaylistCreationView
+        android:id="@+id/tag_manager_rule"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/playlist_name_edittext" />
+
+    <TextView
+        android:id="@+id/pre_optionality_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/pre_spinner_text"
+        app:layout_constraintBaseline_toBaselineOf="@+id/create_playlist_spinner"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Spinner
+        android:id="@+id/create_playlist_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:entries="@array/create_playlist_spinner_entries"
+        app:layout_constraintBottom_toBottomOf="@+id/create_playlist_button"
+        app:layout_constraintStart_toEndOf="@+id/pre_optionality_textview"
+        app:layout_constraintTop_toTopOf="@+id/create_playlist_button" />
+
+    <TextView
+        android:id="@+id/post_spinner_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/post_spinner_text"
+        app:layout_constraintBaseline_toBaselineOf="@+id/create_playlist_spinner"
+        app:layout_constraintStart_toEndOf="@+id/create_playlist_spinner" />
+
+    <Button
+        android:id="@+id/create_playlist_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/create_playlist_button_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tag_manager_rule" />
+
+</merge>

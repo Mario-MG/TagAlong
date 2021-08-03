@@ -7,12 +7,13 @@ import android.util.AttributeSet
 import android.widget.Toast
 import com.hfad.tagalong.R
 import com.hfad.tagalong.tools.DBHelper
+import com.hfad.tagalong.tools.api.PlaylistManager
 import com.hfad.tagalong.types.CustomTrack
 import com.hfad.tagmanagerview.TagManagerView
 import java.util.*
 import kotlin.concurrent.thread
 
-class CustomTagManagerForSingleTrackView @JvmOverloads constructor(
+class TagManagerForSingleTrackView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
@@ -25,14 +26,29 @@ class CustomTagManagerForSingleTrackView @JvmOverloads constructor(
     }
 
     override fun addItemToList(item: String) {
-        try {
-            DBHelper(context).apply {
-                insertSongWithTag(track, inputText)
-                close()
-            }
+        try { // TODO: thread?
+            addSongWithTagToDb()
+            addSongToPlaylists()
             super.addItemToList(item)
         } catch (ex: SQLiteConstraintException) {
             showRepeatedTagToast()
+        }
+    }
+
+    private fun addSongWithTagToDb() {
+        DBHelper(context).apply {
+            insertSongWithTag(track, inputText)
+            close()
+        }
+    }
+
+    private fun addSongToPlaylists() {
+        val dbHelper = DBHelper(context)
+        val playlists = dbHelper.selectPlaylistsToAddSongWithTag(track.id, inputText)
+        playlists.forEach { playlistId ->
+            thread {
+                PlaylistManager.addTracksToPlaylist(playlistId, track.id)
+            }
         }
     }
 

@@ -44,7 +44,7 @@ object PlaylistManager {
         description: String = "",
         public: Boolean = true,
         collaborative: Boolean = false
-    ): ApiResponse<Playlist>? {
+    ): ApiResponse<Playlist> {
         val token = TokenManager.getToken()
 
         val body = """
@@ -57,7 +57,7 @@ object PlaylistManager {
         """.trimIndent().toRequestBody(ContentType.CONTENT_TYPE_JSON.toMediaType())
 
         val userID = UserManager.getUserID()
-        if (userID !== null) {
+//        if (userID !== null) {
             val request = Request.Builder()
                 .url(URLBuilder()
                     .from(Host.API, Endpoint.CREATE_PLAYLIST)
@@ -68,8 +68,8 @@ object PlaylistManager {
                 .build()
 
             return RequestManager.sendRequest(request)
-        }
-        return null // TODO: Lanzar excepción en caso de userID nulo
+//        }
+//        return null // TODO: Lanzar excepción en caso de userID nulo
     }
 
     fun unfollowPlaylist(playlistId: String): ApiResponse<Any?> { // TODO: Revisar uso de Any
@@ -109,6 +109,20 @@ object PlaylistManager {
                 .build())
             .header("Authorization", "Bearer $token")
             .post(body)
+            .build()
+
+        return RequestManager.sendRequest(request)
+    }
+
+    fun getPlaylist(playlistId: String): ApiResponse<Playlist> {
+        val token = TokenManager.getToken()
+
+        val request = Request.Builder()
+            .url(URLBuilder()
+                .from(Host.API, Endpoint.PLAYLIST)
+                .replace("playlist_id", playlistId)
+                .build())
+            .header("Authorization", "Bearer $token")
             .build()
 
         return RequestManager.sendRequest(request)

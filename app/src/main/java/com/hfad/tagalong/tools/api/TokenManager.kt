@@ -118,7 +118,7 @@ object TokenManager {
             .build()
     }
 
-    // Source: https://auth0.com/docs/flows/call-your-api-using-the-authorization-code-flow-with-pkc
+    // Source: https://auth0.com/docs/flows/call-your-api-using-the-authorization-code-flow-with-pkce
     private fun generateCodeVerifier() {
         val sr = SecureRandom()
         val code = ByteArray(32)
@@ -129,7 +129,7 @@ object TokenManager {
         )
     }
 
-    // Source: https://auth0.com/docs/flows/call-your-api-using-the-authorization-code-flow-with-pkc
+    // Source: https://auth0.com/docs/flows/call-your-api-using-the-authorization-code-flow-with-pkce
     private fun getCodeChallenge(): String {
         val bytes: ByteArray = codeVerifier.toByteArray(Charset.forName("US-ASCII"))
         val md = MessageDigest.getInstance("SHA-256")
