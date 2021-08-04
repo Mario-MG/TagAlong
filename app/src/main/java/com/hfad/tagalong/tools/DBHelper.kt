@@ -61,14 +61,15 @@ class DBHelper(context: Context)
         baseSql: String,
         selectionArgs: Array<out String>? = null
     ): ArrayList<String> {
-        var sql = baseSql
-        if (selectionArgs?.isEmpty() == true) {
-            return emptyList<String>() as ArrayList<String>
-        } else if (selectionArgs !== null) {
-            val selectionArgsString = selectionArgs.joinToString("', '", "'", "'")
-            sql = sql.format(selectionArgsString)
+        return when {
+            selectionArgs == null -> getStringArrayListFromSql(baseSql)
+            selectionArgs.isEmpty() -> emptyList<String>() as ArrayList<String>
+            else -> {
+                val selectionArgsString = selectionArgs.joinToString("', '", "'", "'")
+                val sql = baseSql.format(selectionArgsString)
+                getStringArrayListFromSql(sql)
+            }
         }
-        return getStringArrayListFromSql(sql)
     }
 
     private fun runSimpleSelect(
