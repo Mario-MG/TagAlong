@@ -6,8 +6,8 @@ import android.database.sqlite.SQLiteConstraintException
 import android.util.AttributeSet
 import android.widget.Toast
 import com.hfad.tagalong.R
-import com.hfad.tagalong.tools.db.SqliteDbHelper
 import com.hfad.tagalong.tools.api.PlaylistManager
+import com.hfad.tagalong.tools.db.room.RoomDbHelper
 import com.hfad.tagalong.types.Track
 import com.hfad.tagmanagerview.TagManagerView
 import java.util.*
@@ -22,7 +22,7 @@ class TagManagerForSingleTrackView @JvmOverloads constructor(
     lateinit var track: Track
 
     override fun preProcessText() {
-        inputText = inputText.toLowerCase(Locale.ROOT)
+        inputText = inputText.lowercase(Locale.ROOT)
     }
 
     override fun addItemToList(item: String) {
@@ -36,15 +36,14 @@ class TagManagerForSingleTrackView @JvmOverloads constructor(
     }
 
     private fun addSongWithTagToDb() {
-        SqliteDbHelper(context).apply {
+        RoomDbHelper(context).apply {
             insertSongWithTag(track, inputText)
-            close()
         }
     }
 
     private fun addSongToPlaylists() {
-        val dbHelper = SqliteDbHelper(context)
-        val playlists = dbHelper.selectPlaylistsToAddSongWithTag(track.id, inputText)
+        val dbHelper = RoomDbHelper(context)
+        val playlists = dbHelper.selectPlaylistsToAddSongWithTag(track.id, inputText) // TODO: Reemplazar por getRulesFulfilledByTags
         playlists.forEach { playlistId ->
             thread {
                 PlaylistManager.addTracksToPlaylist(playlistId, track.id)
@@ -72,9 +71,8 @@ class TagManagerForSingleTrackView @JvmOverloads constructor(
     override fun onClickCloseIcon(position: Int, tagName: String) {
         super.onClickCloseIcon(position, tagName)
         thread {
-            SqliteDbHelper(context).apply {
-                deleteSongWithTag(track.id, tagName)
-                close()
+            RoomDbHelper(context).apply {
+                deleteSongWithTag(track, tagName)
             }
         }
     }

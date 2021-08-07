@@ -15,6 +15,7 @@ internal interface RuleDao : BaseDao<RuleEntity> {
     @Delete(entity = RuleEntity::class)
     fun deleteById(vararg ruleIds: RuleId)
 
+    @Transaction
     @Query(
         """
         SELECT * FROM Rule r
@@ -37,5 +38,5 @@ internal interface RuleDao : BaseDao<RuleEntity> {
         )
     """
     )
-    fun getRulesFulfilledByTagNames(newTag: String, vararg originalTags: String): List<RuleEntity>
+    fun getRulesFulfilledByTagNames(newTag: String, vararg originalTags: String): List<RuleWithTags>
 }

@@ -12,13 +12,14 @@ import com.hfad.tagalong.R
 import com.hfad.tagalong.tools.api.PlaylistManager
 import com.hfad.tagalong.types.PlaylistCreationRule
 import com.hfad.tagalong.types.RuleObserver
+import com.hfad.tagalong.types.Tag
 import com.hfad.tagalong.views.PlaylistRuleCreatorView
 import com.hfad.tagmanagerview.TagManagerView
 import kotlin.concurrent.thread
 
 class PlaylistCreatorAdapter(
     private val activity: FragmentActivity,
-    private val playlistCreationRules: ArrayList<PlaylistCreationRule>
+    private val playlistCreationRules: MutableList<PlaylistCreationRule>
 ) : RecyclerView.Adapter<PlaylistCreatorAdapter.ViewHolder>(), RuleObserver {
     private lateinit var creatorView: PlaylistRuleCreatorView
 
@@ -72,7 +73,7 @@ class PlaylistCreatorAdapter(
         }
 
         private fun populateTagManager() {
-            tagManager!!.tagList = rule.tags
+            tagManager!!.tagList = rule.tags.map(Tag::name).toMutableList()
         }
 
         private fun populateOptionalityTextView() {

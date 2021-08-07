@@ -19,7 +19,11 @@ interface DbHelper {
 
     fun insertSongWithTag(song: Track, tag: Tag)
 
+    fun deleteSongWithTag(song: Track, tag: Tag)
+
     fun getAllRules(): List<PlaylistCreationRule>
+
+    fun getRulesFulfilledByTags(newTag: Tag, vararg originalTags: Tag): List<PlaylistCreationRule>
 
     fun insertRule(rule: PlaylistCreationRule)
 

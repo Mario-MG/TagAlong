@@ -3,31 +3,27 @@ package com.hfad.tagalong.activities
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.Spinner
+import android.view.*
+import android.widget.*
 import androidx.fragment.app.FragmentActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.hfad.tagalong.R
-import com.hfad.tagalong.tools.db.SqliteDbHelper
 import com.hfad.tagalong.tools.adapters.PlaylistCreatorAdapter
-import com.hfad.tagalong.types.PlaylistCreationRule
+import com.hfad.tagalong.tools.db.room.RoomDbHelper
+import com.hfad.tagalong.types.*
 import com.hfad.tagalong.views.TagManagerForPlaylistCreationView
 import kotlin.concurrent.thread
 
 class ManagerFragment : Fragment() {
     private lateinit var mActivity: FragmentActivity
-    private lateinit var mDbHelper: SqliteDbHelper
+    private lateinit var mDbHelper: DbHelper
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var tagManagerView: TagManagerForPlaylistCreationView
     private lateinit var createPlaylistButton: Button
     private lateinit var spinner: Spinner
 
-    private lateinit var rules: ArrayList<PlaylistCreationRule>
+    private lateinit var rules: List<PlaylistCreationRule>
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -58,15 +54,14 @@ class ManagerFragment : Fragment() {
 
     private fun populateRecyclerView() {
         thread {
-            mDbHelper = SqliteDbHelper(mActivity)
-            rules = mDbHelper.selectAllRulesWithTags()
-            mDbHelper.close()
+            mDbHelper = RoomDbHelper(mActivity)
+            rules = mDbHelper.getAllRules()
             setRulesIntoRecyclerView()
         }
     }
 
     private fun setRulesIntoRecyclerView() {
-        val adapter = PlaylistCreatorAdapter(mActivity, rules)
+        val adapter = PlaylistCreatorAdapter(mActivity, rules.toMutableList())
         mActivity.runOnUiThread {
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(activity)

@@ -4,18 +4,14 @@ import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.hfad.tagalong.R
 import com.hfad.tagalong.config.Optionality
-import com.hfad.tagalong.tools.db.SqliteDbHelper
 import com.hfad.tagalong.tools.api.PlaylistManager
-import com.hfad.tagalong.types.PlaylistCreationRule
-import com.hfad.tagalong.types.RuleObserver
-import com.hfad.tagalong.types.RuleSubject
+import com.hfad.tagalong.tools.db.room.RoomDbHelper
+import com.hfad.tagalong.types.*
 import com.hfad.tagmanagerview.TagManagerView
 import kotlin.concurrent.thread
 
@@ -31,7 +27,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
     private val optionalitySpinner: Spinner
     private val createPlaylistRuleButton: Button
 
-    private lateinit var dbHelper: SqliteDbHelper
+    private lateinit var dbHelper: DbHelper
     private val subscribers: HashSet<RuleObserver> = HashSet()
 
     lateinit var rule: PlaylistCreationRule
@@ -51,7 +47,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
             autoUpdateSwitch.isChecked = field
         }
 
-    private var tags = ArrayList<String>()
+    private var tags: MutableList<String> = emptyList<String>().toMutableList()
         get() = tagManager.tagList
         set(value) {
             field = value
@@ -76,9 +72,8 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
         createPlaylistRuleButton = findViewById(R.id.create_playlist_button)
 
         thread {
-            dbHelper = SqliteDbHelper(context)
-            val allTags = dbHelper.selectAllTags()
-            dbHelper.close()
+            dbHelper = RoomDbHelper(context)
+            val allTags = dbHelper.getAllTags()
             (context as Activity).runOnUiThread {
                 tagManager.autoCompleteTagList = allTags
             }
@@ -109,17 +104,16 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
     }
 
     private fun getSongIdsForSelectedTagsFromDb(selectedTags: ArrayList<String>): List<String> {
-        dbHelper = SqliteDbHelper(context)
+        dbHelper = RoomDbHelper(context)
         val songIds = selectSongIdsWithSelectedTags(selectedTags)
-        dbHelper.close()
         return songIds
     }
 
     private fun selectSongIdsWithSelectedTags(selectedTags: ArrayList<String>): List<String> {
         return if (optionality) {
-            dbHelper.selectSongIdsWithAnyTags(*selectedTags.toTypedArray())
+            dbHelper.getSongsWithAnyOfTheTags(*selectedTags.toTypedArray())
         } else {
-            dbHelper.selectSongIdsWithAllTags(*selectedTags.toTypedArray())
+            dbHelper.getSongsWithAllOfTheTags(*selectedTags.toTypedArray())
         }
     }
 
@@ -155,9 +149,8 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
     }
 
     private fun saveRuleToDB() {
-        dbHelper = SqliteDbHelper(context)
+        dbHelper = RoomDbHelper(context)
         val ruleId = dbHelper.insertRule(rule)
-        dbHelper.close()
         rule.ruleId = ruleId
     }
 

@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
 import com.hfad.tagalong.config.Extras
-import com.hfad.tagalong.tools.db.SqliteDbHelper
 import com.hfad.tagalong.tools.adapters.TracksAdapter
+import com.hfad.tagalong.tools.db.room.RoomDbHelper
 import com.hfad.tagalong.types.Track
 import kotlin.concurrent.thread
 
@@ -55,9 +55,8 @@ class TrackListActivity : AppCompatActivity() {
     }
 
     private fun getTracksForTagName(): ArrayList<Track> {
-        val dbHelper = SqliteDbHelper(this)
-        val tracksWithTag = dbHelper.selectSongDataByTagNames(tagName!!)
-        dbHelper.close()
+        val dbHelper = RoomDbHelper(this)
+        val tracksWithTag = dbHelper.getSongsWithAnyOfTheTags(tagName!!)
         return tracksWithTag
     }
 

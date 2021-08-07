@@ -52,8 +52,18 @@ class RoomDbHelper(context: Context) : DbHelper {
         songTagCrossRefDao.insert(SongTagCrossRef(song.id, tag.id))
     }
 
+    override fun deleteSongWithTag(song: Track, tag: Tag) {
+        songTagCrossRefDao.delete(SongTagCrossRef(song.id, tag.id))
+    }
+
     override fun getAllRules(): List<PlaylistCreationRule> {
         return ruleDao.getAll().map(RuleWithTags::toPlaylistCreationRule)
+    }
+
+    override fun getRulesFulfilledByTags(newTag: Tag, vararg originalTags: Tag): List<PlaylistCreationRule> {
+        return ruleDao
+            .getRulesFulfilledByTagNames(newTag.name, *originalTags.map(Tag::name).toTypedArray())
+            .map(RuleWithTags::toPlaylistCreationRule)
     }
 
     override fun insertRule(rule: PlaylistCreationRule) {
