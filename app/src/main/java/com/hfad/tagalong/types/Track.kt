@@ -3,7 +3,7 @@ package com.hfad.tagalong.types
 import com.hfad.tagalong.tools.api.PlaylistManager
 import com.hfad.tagalong.tools.api.types.PlaylistItemGroup
 
-data class CustomTrack(
+data class Track(
     val id: String,
     val name: String,
     val album: String,
@@ -13,7 +13,7 @@ data class CustomTrack(
     companion object {
         private val totalTracksByPlaylistId = HashMap<String, Int>()
 
-        fun getTracksFromApi(playlistId: String, offset: Int = 0, limit: Int = 100): List<CustomTrack> {
+        fun getTracksFromApi(playlistId: String, offset: Int = 0, limit: Int = 100): List<Track> {
             val apiResponse = PlaylistManager.getPlaylistTracks(playlistId, offset, limit)
             if (apiResponse.success) {
                 return processApiResponse(apiResponse, playlistId)
@@ -25,17 +25,17 @@ data class CustomTrack(
         private fun processApiResponse(
             apiResponse: ApiResponse<PlaylistItemGroup>,
             playlistId: String
-        ): List<CustomTrack> {
+        ): List<Track> {
             totalTracksByPlaylistId[playlistId] = apiResponse.result!!.total
             return createListFromApiResponse(apiResponse)
         }
 
         private fun createListFromApiResponse(
             apiResponse: ApiResponse<PlaylistItemGroup>
-        ): List<CustomTrack> {
+        ): List<Track> {
             return apiResponse.result!!.items.map { item ->
                 val artists = item.track?.artists?.map { artist -> artist.name }
-                CustomTrack(
+                Track(
                     item.track?.id ?: "null",
                     item.track?.name ?: "null",
                     item.track?.album?.name ?: "null",

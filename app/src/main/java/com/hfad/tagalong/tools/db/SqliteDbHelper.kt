@@ -1,4 +1,4 @@
-package com.hfad.tagalong.tools
+package com.hfad.tagalong.tools.db
 
 import android.content.ContentValues
 import android.content.Context
@@ -6,10 +6,10 @@ import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import com.hfad.tagalong.config.Optionality
-import com.hfad.tagalong.types.CustomTrack
+import com.hfad.tagalong.types.Track
 import com.hfad.tagalong.types.PlaylistCreationRule
 
-class DBHelper(context: Context)
+class SqliteDbHelper(context: Context)
     : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     private val readableDB = this.readableDatabase
     private val writableDB = this.writableDatabase
@@ -93,8 +93,8 @@ class DBHelper(context: Context)
         return stringArrayList
     }
 
-    fun selectSongDataForIds(songId: String, vararg moreSongIds: String): ArrayList<CustomTrack> {
-        val songsList = ArrayList<CustomTrack>()
+    fun selectSongDataForIds(songId: String, vararg moreSongIds: String): ArrayList<Track> {
+        val songsList = ArrayList<Track>()
         val selectionArg = moreSongIds.joinToString(", ", songId)
         val cursor = readableDB.rawQuery(SQL_SELECT_SONGS_BY_ID, arrayOf(selectionArg))
         if (cursor.moveToFirst()) {
@@ -104,7 +104,7 @@ class DBHelper(context: Context)
                 val songArtists = cursor.getString(2).split(", ")
                 val songImageUrl = cursor.getString(3)
                 songsList.add(
-                    CustomTrack(
+                    Track(
                         songId,
                         songName,
                         songAlbum,
@@ -119,8 +119,8 @@ class DBHelper(context: Context)
         return songsList
     }
 
-    fun selectSongDataByTagNames(tagName: String, vararg moreTagNames: String): ArrayList<CustomTrack> {
-        val songsList = ArrayList<CustomTrack>()
+    fun selectSongDataByTagNames(tagName: String, vararg moreTagNames: String): ArrayList<Track> {
+        val songsList = ArrayList<Track>()
         val selectionArg = moreTagNames.joinToString(", ", tagName)
         val cursor = readableDB.rawQuery(SQL_SELECT_SONGS_BY_TAG_NAME, arrayOf(selectionArg))
         if (cursor.moveToFirst()) {
@@ -131,7 +131,7 @@ class DBHelper(context: Context)
                 val songArtists = cursor.getString(3).split(", ")
                 val songImageUrl = cursor.getString(4)
                 songsList.add(
-                    CustomTrack(
+                    Track(
                         songId,
                         songName,
                         songAlbum,
@@ -146,7 +146,7 @@ class DBHelper(context: Context)
         return songsList
     }
 
-    fun insertSongWithTag(track: CustomTrack, tagName: String) {
+    fun insertSongWithTag(track: Track, tagName: String) {
         insertIntoSongsTags(track.id, tagName)
         insertSongData(track)
     }
@@ -159,7 +159,7 @@ class DBHelper(context: Context)
         writableDB.insertOrThrow(TABLE_SONGS_TAGS, null, insertValues)
     }
 
-    private fun insertSongData(track: CustomTrack) {
+    private fun insertSongData(track: Track) {
         val insertValues = ContentValues().apply {
             put(SONG_ID, track.id)
             put(SONG_NAME, track.name)

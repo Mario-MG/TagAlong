@@ -7,8 +7,8 @@ import android.widget.*
 import com.google.gson.Gson
 import com.hfad.tagalong.R
 import com.hfad.tagalong.config.Extras
-import com.hfad.tagalong.tools.DBHelper
-import com.hfad.tagalong.types.CustomTrack
+import com.hfad.tagalong.tools.db.SqliteDbHelper
+import com.hfad.tagalong.types.Track
 import com.hfad.tagalong.views.TagManagerForSingleTrackView
 import com.squareup.picasso.Picasso
 import kotlin.concurrent.thread
@@ -19,7 +19,7 @@ class SingleTrackTaggingActivity : AppCompatActivity() {
     private lateinit var trackInfoTextView: TextView
     private lateinit var tagManagerView: TagManagerForSingleTrackView
 
-    private lateinit var track: CustomTrack
+    private lateinit var track: Track
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +37,7 @@ class SingleTrackTaggingActivity : AppCompatActivity() {
 
     private fun initializeTrack() {
         val trackData = intent.getStringExtra(Extras.TRACK_DATA)
-        track = Gson().fromJson(trackData, CustomTrack::class.java)
+        track = Gson().fromJson(trackData, Track::class.java)
     }
 
     private fun initializeImageView() {
@@ -69,7 +69,7 @@ class SingleTrackTaggingActivity : AppCompatActivity() {
 
     private fun populateTagManagerView() {
         thread {
-            val dbHelper = DBHelper(this)
+            val dbHelper = SqliteDbHelper(this)
             val currentTags = dbHelper.selectTagNamesBySongId(track.id)
             val allTags = dbHelper.selectAllTags()
             dbHelper.close()

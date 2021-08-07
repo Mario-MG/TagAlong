@@ -11,14 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
 import com.hfad.tagalong.activities.TrackListActivity
 import com.hfad.tagalong.config.Extras
-import com.hfad.tagalong.types.CustomPlaylist
+import com.hfad.tagalong.types.Playlist
 import com.squareup.picasso.Picasso
 import kotlin.concurrent.thread
 
 // Source: https://guides.codepath.com/android/using-the-recyclerview
 class PlaylistsAdapter (
     private val activity: FragmentActivity,
-    private val playlists: ArrayList<CustomPlaylist>
+    private val playlists: ArrayList<Playlist>
 ) : RecyclerView.Adapter<PlaylistsAdapter.ViewHolder>() {
 
     inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
@@ -28,7 +28,7 @@ class PlaylistsAdapter (
 
         private val context = listItemView.context
 
-        private lateinit var playlist: CustomPlaylist
+        private lateinit var playlist: Playlist
 
         init {
             listItemView.setOnClickListener {
@@ -47,7 +47,7 @@ class PlaylistsAdapter (
             context.startActivity(trackListIntent)
         }
 
-        fun bindPlaylist(playlist: CustomPlaylist) {
+        fun bindPlaylist(playlist: Playlist) {
             this.playlist = playlist
             populate()
         }
@@ -94,7 +94,7 @@ class PlaylistsAdapter (
         viewHolder.bindPlaylist(playlists[position])
     }
 
-    private fun areThereMorePlaylistsToLoad() = itemCount < CustomPlaylist.getTotalPlaylists()
+    private fun areThereMorePlaylistsToLoad() = itemCount < Playlist.getTotalPlaylists()
 
     private fun isLastItem(position: Int) = position == itemCount - 1
 
@@ -117,7 +117,7 @@ class PlaylistsAdapter (
     private fun getAndAddMorePlaylists() {
         thread {
             val oldItemCount = itemCount
-            val newPlaylists = CustomPlaylist.getAllPlaylistsFromApi(oldItemCount)
+            val newPlaylists = Playlist.getAllPlaylistsFromApi(oldItemCount)
             activity.runOnUiThread {
                 playlists.addAll(newPlaylists)
                 this.notifyItemRangeInserted(oldItemCount, itemCount)

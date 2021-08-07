@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
 import com.hfad.tagalong.config.Extras
-import com.hfad.tagalong.tools.DBHelper
+import com.hfad.tagalong.tools.db.SqliteDbHelper
 import com.hfad.tagalong.tools.adapters.TracksAdapter
-import com.hfad.tagalong.types.CustomTrack
+import com.hfad.tagalong.types.Track
 import kotlin.concurrent.thread
 
 
@@ -17,7 +17,7 @@ class TrackListActivity : AppCompatActivity() {
 
     private var playlistId: String? = null
     private var tagName: String? = null
-    private lateinit var tracks: ArrayList<CustomTrack>
+    private lateinit var tracks: ArrayList<Track>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,13 +49,13 @@ class TrackListActivity : AppCompatActivity() {
         }
     }
 
-    private fun getTracksForPlaylistId(): ArrayList<CustomTrack> {
-        val allTracks = CustomTrack.getTracksFromApi(playlistId!!)
-        return allTracks.filter { track -> track.name != "null" } as ArrayList<CustomTrack>
+    private fun getTracksForPlaylistId(): ArrayList<Track> {
+        val allTracks = Track.getTracksFromApi(playlistId!!)
+        return allTracks.filter { track -> track.name != "null" } as ArrayList<Track>
     }
 
-    private fun getTracksForTagName(): ArrayList<CustomTrack> {
-        val dbHelper = DBHelper(this)
+    private fun getTracksForTagName(): ArrayList<Track> {
+        val dbHelper = SqliteDbHelper(this)
         val tracksWithTag = dbHelper.selectSongDataByTagNames(tagName!!)
         dbHelper.close()
         return tracksWithTag

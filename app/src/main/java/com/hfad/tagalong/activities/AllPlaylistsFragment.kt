@@ -11,13 +11,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
 import com.hfad.tagalong.tools.adapters.PlaylistsAdapter
-import com.hfad.tagalong.types.CustomPlaylist
+import com.hfad.tagalong.types.Playlist
 import kotlin.concurrent.thread
 
 class AllPlaylistsFragment : Fragment() {
     private lateinit var mActivity: FragmentActivity
 
-    private lateinit var playlists: ArrayList<CustomPlaylist>
+    private lateinit var playlists: ArrayList<Playlist>
     private lateinit var playlistsRecyclerView: RecyclerView
 
     override fun onAttach(context: Context) {
@@ -50,7 +50,7 @@ class AllPlaylistsFragment : Fragment() {
 
     private fun populatePlaylistsRecyclerView() {
         thread {
-            playlists = CustomPlaylist.getAllPlaylistsFromApi() as ArrayList<CustomPlaylist>
+            playlists = Playlist.getAllPlaylistsFromApi() as ArrayList<Playlist>
             setPlaylistsIntoRecyclerView()
         }
     }

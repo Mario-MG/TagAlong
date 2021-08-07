@@ -10,7 +10,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
-import com.hfad.tagalong.tools.DBHelper
+import com.hfad.tagalong.tools.db.SqliteDbHelper
 import com.hfad.tagalong.tools.adapters.TagsAdapter
 import kotlin.concurrent.thread
 
@@ -55,7 +55,7 @@ class AllTagsFragment : Fragment() {
     }
 
     private fun getAllTagsFromDb() {
-        val dbHelper = DBHelper(mActivity)
+        val dbHelper = SqliteDbHelper(mActivity)
         tags = dbHelper.selectAllTags()
         dbHelper.close()
     }

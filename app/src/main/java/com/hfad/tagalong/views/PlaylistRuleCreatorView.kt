@@ -11,7 +11,7 @@ import androidx.appcompat.widget.SwitchCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.hfad.tagalong.R
 import com.hfad.tagalong.config.Optionality
-import com.hfad.tagalong.tools.DBHelper
+import com.hfad.tagalong.tools.db.SqliteDbHelper
 import com.hfad.tagalong.tools.api.PlaylistManager
 import com.hfad.tagalong.types.PlaylistCreationRule
 import com.hfad.tagalong.types.RuleObserver
@@ -31,7 +31,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
     private val optionalitySpinner: Spinner
     private val createPlaylistRuleButton: Button
 
-    private lateinit var dbHelper: DBHelper
+    private lateinit var dbHelper: SqliteDbHelper
     private val subscribers: HashSet<RuleObserver> = HashSet()
 
     lateinit var rule: PlaylistCreationRule
@@ -76,7 +76,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
         createPlaylistRuleButton = findViewById(R.id.create_playlist_button)
 
         thread {
-            dbHelper = DBHelper(context)
+            dbHelper = SqliteDbHelper(context)
             val allTags = dbHelper.selectAllTags()
             dbHelper.close()
             (context as Activity).runOnUiThread {
@@ -109,7 +109,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
     }
 
     private fun getSongIdsForSelectedTagsFromDb(selectedTags: ArrayList<String>): List<String> {
-        dbHelper = DBHelper(context)
+        dbHelper = SqliteDbHelper(context)
         val songIds = selectSongIdsWithSelectedTags(selectedTags)
         dbHelper.close()
         return songIds
@@ -148,14 +148,14 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
             null,
             tags,
             playlistId,
-            Optionality.forValue(optionality),
+            optionality,
             autoUpdate
         )
         saveRuleToDB()
     }
 
     private fun saveRuleToDB() {
-        dbHelper = DBHelper(context)
+        dbHelper = SqliteDbHelper(context)
         val ruleId = dbHelper.insertRule(rule)
         dbHelper.close()
         rule.ruleId = ruleId

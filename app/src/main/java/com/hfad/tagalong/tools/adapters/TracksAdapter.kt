@@ -1,7 +1,6 @@
 package com.hfad.tagalong.tools.adapters
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
@@ -13,14 +12,14 @@ import com.google.gson.Gson
 import com.hfad.tagalong.R
 import com.hfad.tagalong.activities.SingleTrackTaggingActivity
 import com.hfad.tagalong.config.Extras
-import com.hfad.tagalong.types.CustomTrack
+import com.hfad.tagalong.types.Track
 import com.squareup.picasso.Picasso
 import kotlin.concurrent.thread
 
 // Source: https://guides.codepath.com/android/using-the-recyclerview
 class TracksAdapter(
     private val activity: Activity,
-    private val mTracks: ArrayList<CustomTrack>,
+    private val mTracks: ArrayList<Track>,
     private val playlistId: String?
 ) : RecyclerView.Adapter<TracksAdapter.ViewHolder>() {
 
@@ -31,7 +30,7 @@ class TracksAdapter(
 
         private val context = listItemView.context
 
-        private lateinit var track: CustomTrack
+        private lateinit var track: Track
 
         init {
             listItemView.setOnClickListener {
@@ -50,22 +49,22 @@ class TracksAdapter(
             context.startActivity(singleTrackTaggingIntent)
         }
 
-        fun bindTrack(track: CustomTrack) {
+        fun bindTrack(track: Track) {
             this.track = track
             populate(track)
         }
 
-        private fun populate(track: CustomTrack) {
+        private fun populate(track: Track) {
             populateNameTextView(track)
             populateInfoTextView(track)
             populateImageView(track)
         }
 
-        private fun populateNameTextView(track: CustomTrack) {
+        private fun populateNameTextView(track: Track) {
             nameTextView.text = track.name
         }
 
-        private fun populateInfoTextView(track: CustomTrack) {
+        private fun populateInfoTextView(track: Track) {
             // TODO: Handle more than one artist
             infoTextView.text = context.resources.getString(
                 R.string.track_info,
@@ -74,7 +73,7 @@ class TracksAdapter(
             )
         }
 
-        private fun populateImageView(track: CustomTrack) {
+        private fun populateImageView(track: Track) {
             if (track.imageUrl !== null) {
                 // TODO: Make image square
                 Picasso.get().load(track.imageUrl).into(imageView)
@@ -100,7 +99,7 @@ class TracksAdapter(
 
     private fun areThereMoreTracksToLoad(): Boolean {
         return playlistId == null ||
-            itemCount < CustomTrack.getTotalTracksForPlaylistId(playlistId)
+            itemCount < Track.getTotalTracksForPlaylistId(playlistId)
     }
 
     private fun isLastItem(position: Int) = position == itemCount-1
@@ -127,7 +126,7 @@ class TracksAdapter(
     private fun getMoreTracks(playlistId: String) {
         val oldItemCount = itemCount
         thread {
-            val newTracks = CustomTrack.getTracksFromApi(playlistId, oldItemCount)
+            val newTracks = Track.getTracksFromApi(playlistId, oldItemCount)
             activity.runOnUiThread {
                 mTracks.addAll(newTracks)
                 this.notifyItemRangeInserted(oldItemCount, itemCount)

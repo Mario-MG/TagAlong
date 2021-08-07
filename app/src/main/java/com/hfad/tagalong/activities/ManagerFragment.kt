@@ -6,24 +6,21 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
-import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
-import com.hfad.tagalong.tools.DBHelper
+import com.hfad.tagalong.tools.db.SqliteDbHelper
 import com.hfad.tagalong.tools.adapters.PlaylistCreatorAdapter
-import com.hfad.tagalong.tools.api.PlaylistManager
 import com.hfad.tagalong.types.PlaylistCreationRule
 import com.hfad.tagalong.views.TagManagerForPlaylistCreationView
 import kotlin.concurrent.thread
 
 class ManagerFragment : Fragment() {
     private lateinit var mActivity: FragmentActivity
-    private lateinit var mDbHelper: DBHelper
+    private lateinit var mDbHelper: SqliteDbHelper
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var tagManagerView: TagManagerForPlaylistCreationView
@@ -61,7 +58,7 @@ class ManagerFragment : Fragment() {
 
     private fun populateRecyclerView() {
         thread {
-            mDbHelper = DBHelper(mActivity)
+            mDbHelper = SqliteDbHelper(mActivity)
             rules = mDbHelper.selectAllRulesWithTags()
             mDbHelper.close()
             setRulesIntoRecyclerView()
