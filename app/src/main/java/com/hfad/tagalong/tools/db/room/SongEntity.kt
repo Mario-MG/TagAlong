@@ -5,7 +5,9 @@ import com.hfad.tagalong.types.Track
 
 @Entity(tableName = "Song")
 internal data class SongEntity (
-    @PrimaryKey val id: String,
+    @PrimaryKey
+    @ColumnInfo(name = "song_id")
+    val id: String,
 
     val name: String,
     val album: String,
@@ -27,5 +29,6 @@ internal data class SongEntity (
 }
 
 internal data class SongId (
+    @ColumnInfo(name = "song_id")
     val id: String
 )

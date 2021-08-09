@@ -3,15 +3,15 @@ package com.hfad.tagalong.tools.db.room
 import androidx.room.*
 
 @Entity(
-    primaryKeys = ["songId", "tagId"],
+    primaryKeys = ["song_id", "tag_id"],
     foreignKeys = [ForeignKey(
         entity = SongEntity::class,
-        parentColumns = ["id"],
+        parentColumns = ["song_id"],
         childColumns = ["song_id"],
         onDelete = ForeignKey.CASCADE
     ), ForeignKey(
         entity = TagEntity::class,
-        parentColumns = ["id"],
+        parentColumns = ["tag_id"],
         childColumns = ["tag_id"],
         onDelete = ForeignKey.CASCADE
     )]

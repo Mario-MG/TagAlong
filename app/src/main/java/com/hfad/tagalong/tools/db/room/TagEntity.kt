@@ -5,7 +5,9 @@ import com.hfad.tagalong.types.Tag
 
 @Entity(tableName = "Tag", indices = [Index(value = ["name"], unique = true)])
 internal data class TagEntity (
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "tag_id")
+    val id: Long,
 
     val name: String
 ) {

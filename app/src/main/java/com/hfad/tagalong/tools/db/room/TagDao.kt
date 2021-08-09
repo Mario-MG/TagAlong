@@ -10,7 +10,7 @@ internal interface TagDao : BaseDao<TagEntity> {
     @Query(
         """
         SELECT * FROM Tag
-        WHERE id IN (
+        WHERE tag_id IN (
             SELECT tag_id FROM SongTagCrossRef
             WHERE song_id = :songId
         )

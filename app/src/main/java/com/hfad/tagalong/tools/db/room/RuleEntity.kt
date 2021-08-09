@@ -5,7 +5,9 @@ import com.hfad.tagalong.types.PlaylistCreationRule
 
 @Entity(tableName = "Rule")
 internal data class RuleEntity (
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "rule_id")
+    val id: Long,
 
     @ColumnInfo(name = "playlist_id") val playlistId: String,
     val optionality: Boolean,
@@ -20,5 +22,6 @@ internal data class RuleEntity (
 }
 
 internal data class RuleId (
+    @ColumnInfo(name = "rule_id")
     val id: Long
 )

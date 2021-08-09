@@ -9,7 +9,7 @@ internal interface RuleDao : BaseDao<RuleEntity> {
     fun getAll(): List<RuleWithTags>
 
     @Transaction
-    @Query("SELECT * FROM Rule WHERE id = :ruleId")
+    @Query("SELECT * FROM Rule WHERE rule_id = :ruleId")
     fun getById(ruleId: Long): RuleWithTags
 
     @Delete(entity = RuleEntity::class)
@@ -19,8 +19,8 @@ internal interface RuleDao : BaseDao<RuleEntity> {
     @Query(
         """
         SELECT * FROM Rule r
-        JOIN RuleTagCrossRef rt ON r.id = rt.rule_id
-        JOIN Tag t ON rt.tag_id = t.id
+        JOIN RuleTagCrossRef rt ON r.rule_id = rt.rule_id
+        JOIN Tag t ON rt.tag_id = t.tag_id
         WHERE r.auto_update = 1
         AND ((
                 r.optionality = 1
@@ -31,7 +31,7 @@ internal interface RuleDao : BaseDao<RuleEntity> {
                 AND t.name = :newTag -- TODO: Comprobar que esto funciona (en caso afirmativo, refactorizar fuera del OR)
                 AND rt.rule_id NOT IN (
                     SELECT DISTINCT rt.rule_id FROM RuleTagCrossRef rt
-                    JOIN Tag t on rt.tag_id = t.id
+                    JOIN Tag t on rt.tag_id = t.tag_id
                     WHERE t.name NOT IN (:newTag, :originalTags)
                 )
             )

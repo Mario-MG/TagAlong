@@ -13,9 +13,9 @@ internal interface SongDao : BaseDao<SongEntity> {
     @Query(
         """
         SELECT * FROM Song
-        WHERE id IN (
+        WHERE song_id IN (
             SELECT DISTINCT song_id FROM SongTagCrossRef ts
-            JOIN Tag t ON ts.tag_id = t.id
+            JOIN Tag t ON ts.tag_id = t.tag_id
             WHERE t.name IN (:tagNames)
         )
     """
@@ -25,10 +25,10 @@ internal interface SongDao : BaseDao<SongEntity> {
     @Query(
         """
         SELECT * FROM Song s
-        JOIN SongTagCrossRef ts ON s.id = ts.song_id
-        WHERE s.id NOT IN (
+        JOIN SongTagCrossRef ts ON s.song_id = ts.song_id
+        WHERE s.song_id NOT IN (
             SELECT ts.tag_id FROM SongTagCrossRef ts
-            JOIN Tag t ON ts.tag_id = t.id
+            JOIN Tag t ON ts.tag_id = t.tag_id
             WHERE t.name NOT IN (:tagNames)
         )
     """

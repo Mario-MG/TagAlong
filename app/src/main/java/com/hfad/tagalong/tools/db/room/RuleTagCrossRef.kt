@@ -7,12 +7,12 @@ import com.hfad.tagalong.types.PlaylistCreationRule
     primaryKeys = ["rule_id", "tag_id"],
     foreignKeys = [ForeignKey(
         entity = RuleEntity::class,
-        parentColumns = ["id"],
+        parentColumns = ["rule_id"],
         childColumns = ["rule_id"],
         onDelete = ForeignKey.CASCADE
     ), ForeignKey(
         entity = TagEntity::class,
-        parentColumns = ["id"],
+        parentColumns = ["tag_id"],
         childColumns = ["tag_id"],
         onDelete = ForeignKey.CASCADE
     )])
@@ -26,7 +26,11 @@ internal data class RuleWithTags (
     @Relation(
         parentColumn = "rule_id",
         entityColumn = "tag_id",
-        associateBy = Junction(RuleTagCrossRef::class)
+        associateBy = Junction(
+            RuleTagCrossRef::class,
+            parentColumn = "rule_id",
+            entityColumn = "tag_id"
+        )
     )
     val tags: List<TagEntity>
 ) {
