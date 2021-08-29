@@ -10,7 +10,9 @@ internal data class TagEntity (
     val id: Long,
 
     val name: String
-) {
+) : DbEntity() {
+    constructor(name: String) : this(0, name)
+
     companion object {
         fun toTag(tagEntity: TagEntity): Tag {
             return Tag(tagEntity.id, tagEntity.name)
@@ -18,6 +20,16 @@ internal data class TagEntity (
 
         fun fromTag(tag: Tag): TagEntity {
             return TagEntity(tag.id, tag.name)
+        }
+    }
+
+    internal data class TagName (
+        val name: String
+    ) {
+        companion object {
+            fun fromTag(tag: Tag): TagName {
+                return TagName(tag.name)
+            }
         }
     }
 }

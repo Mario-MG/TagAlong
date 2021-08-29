@@ -3,13 +3,19 @@ package com.hfad.tagalong.types
 interface DbHelper {
     fun getAllTags(): List<Tag>
 
-    fun insertTags(vararg tags: Tag)
+    fun insertTag(tag: Tag): Long
+
+    fun insertTags(vararg tags: Tag): List<Long>
+
+    fun deleteTags(vararg tags: Tag): Int
 
     fun getTagsForSong(song: Track): List<Tag>
 
     fun getAllSongs(): List<Track>
 
-    fun insertSongs(vararg songs: Track)
+    fun insertSong(song: Track): Long
+
+    fun insertSongs(vararg songs: Track): List<Long>
 
     fun deleteSongsById(vararg songIds: String)
 
@@ -25,7 +31,7 @@ interface DbHelper {
 
     fun getRulesFulfilledByTags(newTag: Tag, vararg originalTags: Tag): List<PlaylistCreationRule>
 
-    fun insertRule(rule: PlaylistCreationRule)
+    fun insertRule(rule: PlaylistCreationRule): Long
 
     fun deleteRuleById(ruleId: Long)
 }

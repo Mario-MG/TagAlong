@@ -19,9 +19,10 @@ import kotlin.concurrent.thread
 // Source: https://guides.codepath.com/android/using-the-recyclerview
 class TracksAdapter(
     private val activity: Activity,
-    private val mTracks: ArrayList<Track>,
+    tracks: List<Track>,
     private val playlistId: String?
 ) : RecyclerView.Adapter<TracksAdapter.ViewHolder>() {
+    private val mTracks = tracks.toMutableList()
 
     inner class ViewHolder(listItemView: View) : RecyclerView.ViewHolder(listItemView) {
         val nameTextView = itemView.findViewById<TextView>(R.id.track_name_tv)

@@ -12,12 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hfad.tagalong.R
 import com.hfad.tagalong.tools.adapters.TagsAdapter
 import com.hfad.tagalong.tools.db.room.RoomDbHelper
+import com.hfad.tagalong.types.Tag
 import kotlin.concurrent.thread
 
 class AllTagsFragment : Fragment() {
     private lateinit var mActivity: FragmentActivity
 
-    private lateinit var tags: ArrayList<String>
+    private lateinit var tags: List<String>
     private lateinit var tagsRecyclerView: RecyclerView
 
     override fun onAttach(context: Context) {
@@ -56,7 +57,7 @@ class AllTagsFragment : Fragment() {
 
     private fun getAllTagsFromDb() {
         val dbHelper = RoomDbHelper(mActivity)
-        tags = dbHelper.getAllTags()
+        tags = dbHelper.getAllTags().map(Tag::name)
     }
 
     private fun setTagsIntoRecyclerView() {

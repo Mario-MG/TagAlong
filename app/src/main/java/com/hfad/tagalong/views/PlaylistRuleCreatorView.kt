@@ -75,7 +75,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
             dbHelper = RoomDbHelper(context)
             val allTags = dbHelper.getAllTags()
             (context as Activity).runOnUiThread {
-                tagManager.autoCompleteTagList = allTags
+                tagManager.autoCompleteTagList = allTags.map(Tag::name).toMutableList()
             }
         }
 
@@ -95,7 +95,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
         }
     }
 
-    private fun createPlaylistWithSelectedTags(selectedTags: ArrayList<String>): String? {
+    private fun createPlaylistWithSelectedTags(selectedTags: Collection<String>): String? {
         val songIds = getSongIdsForSelectedTagsFromDb(selectedTags)
         if (songIds.isNotEmpty()) {
             return createAndPopulatePlaylist(songIds)
@@ -103,17 +103,17 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
         return null
     }
 
-    private fun getSongIdsForSelectedTagsFromDb(selectedTags: ArrayList<String>): List<String> {
+    private fun getSongIdsForSelectedTagsFromDb(selectedTags: Collection<String>): List<String> {
         dbHelper = RoomDbHelper(context)
-        val songIds = selectSongIdsWithSelectedTags(selectedTags)
+        val songIds = selectSongIdsWithSelectedTags(selectedTags).map(Track::id)
         return songIds
     }
 
-    private fun selectSongIdsWithSelectedTags(selectedTags: ArrayList<String>): List<String> {
+    private fun selectSongIdsWithSelectedTags(selectedTags: Collection<String>): List<Track> {
         return if (optionality) {
-            dbHelper.getSongsWithAnyOfTheTags(*selectedTags.toTypedArray())
+            dbHelper.getSongsWithAnyOfTheTags(*selectedTags.map(::Tag).toTypedArray())
         } else {
-            dbHelper.getSongsWithAllOfTheTags(*selectedTags.toTypedArray())
+            dbHelper.getSongsWithAllOfTheTags(*selectedTags.map(::Tag).toTypedArray())
         }
     }
 
@@ -139,8 +139,7 @@ class PlaylistRuleCreatorView @JvmOverloads constructor(
 
     private fun createRuleWithPlaylistId(playlistId: String) {
         rule = PlaylistCreationRule(
-            null,
-            tags,
+            tags.map(::Tag),
             playlistId,
             optionality,
             autoUpdate

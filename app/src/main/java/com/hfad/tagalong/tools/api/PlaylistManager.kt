@@ -2,7 +2,7 @@ package com.hfad.tagalong.tools.api
 
 import com.hfad.tagalong.tools.api.config.*
 import com.hfad.tagalong.tools.api.types.*
-import com.hfad.tagalong.types.*
+import com.hfad.tagalong.types.ApiResponse
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody

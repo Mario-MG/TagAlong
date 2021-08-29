@@ -8,6 +8,7 @@ import android.widget.Toast
 import com.hfad.tagalong.R
 import com.hfad.tagalong.tools.api.PlaylistManager
 import com.hfad.tagalong.tools.db.room.RoomDbHelper
+import com.hfad.tagalong.types.Tag
 import com.hfad.tagalong.types.Track
 import com.hfad.tagmanagerview.TagManagerView
 import java.util.*
@@ -37,18 +38,18 @@ class TagManagerForSingleTrackView @JvmOverloads constructor(
 
     private fun addSongWithTagToDb() {
         RoomDbHelper(context).apply {
-            insertSongWithTag(track, inputText)
+            insertSongWithTag(track, Tag(inputText))
         }
     }
 
     private fun addSongToPlaylists() {
-        val dbHelper = RoomDbHelper(context)
-        val playlists = dbHelper.selectPlaylistsToAddSongWithTag(track.id, inputText) // TODO: Reemplazar por getRulesFulfilledByTags
-        playlists.forEach { playlistId ->
-            thread {
-                PlaylistManager.addTracksToPlaylist(playlistId, track.id)
-            }
-        }
+//        val dbHelper = RoomDbHelper(context)
+//        val playlists = dbHelper.selectPlaylistsToAddSongWithTag(track.id, inputText) // TODO: Reemplazar por getRulesFulfilledByTags
+//        playlists.forEach { playlistId ->
+//            thread {
+//                PlaylistManager.addTracksToPlaylist(playlistId, track.id)
+//            }
+//        }
     }
 
     private fun showRepeatedTagToast() {
@@ -72,7 +73,7 @@ class TagManagerForSingleTrackView @JvmOverloads constructor(
         super.onClickCloseIcon(position, tagName)
         thread {
             RoomDbHelper(context).apply {
-                deleteSongWithTag(track, tagName)
+                deleteSongWithTag(track, Tag(tagName))
             }
         }
     }

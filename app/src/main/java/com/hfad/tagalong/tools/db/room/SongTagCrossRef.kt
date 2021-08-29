@@ -19,7 +19,7 @@ import androidx.room.*
 internal data class SongTagCrossRef (
     @ColumnInfo(name = "song_id") val songId: String,
     @ColumnInfo(name = "tag_id") val tagId: Long
-)
+) : DbEntity()
 
 //internal data class TagWithSongs (
 //    @Embedded val tag: TagEntity,

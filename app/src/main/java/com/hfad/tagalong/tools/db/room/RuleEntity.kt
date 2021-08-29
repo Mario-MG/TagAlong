@@ -12,16 +12,16 @@ internal data class RuleEntity (
     @ColumnInfo(name = "playlist_id") val playlistId: String,
     val optionality: Boolean,
     @ColumnInfo(name = "auto_update") val autoUpdate: Boolean
-) {
+) : DbEntity() {
     companion object {
         fun fromPlaylistCreationRule(playlistCreationRule: PlaylistCreationRule): RuleEntity {
             return RuleEntity(playlistCreationRule.ruleId, playlistCreationRule.playlistId,
                     playlistCreationRule.optionality.value, playlistCreationRule.autoUpdate)
         }
     }
-}
 
-internal data class RuleId (
-    @ColumnInfo(name = "rule_id")
-    val id: Long
-)
+    internal data class Id (
+        @ColumnInfo(name = "rule_id")
+        val id: Long
+    )
+}

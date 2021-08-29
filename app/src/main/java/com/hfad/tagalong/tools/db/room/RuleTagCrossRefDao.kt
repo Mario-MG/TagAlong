@@ -8,5 +8,5 @@ internal interface RuleTagCrossRefDao : BaseDao<RuleTagCrossRef> {
     fun getAll(): List<RuleTagCrossRef>
 
     @Delete(entity = RuleTagCrossRef::class)
-    fun deleteByRuleId(ruleId: RuleId)
+    fun deleteByRuleId(ruleId: RuleEntity.Id)
 }

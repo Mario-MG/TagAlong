@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import com.hfad.tagalong.R
 import com.hfad.tagalong.config.Extras
 import com.hfad.tagalong.tools.db.room.RoomDbHelper
+import com.hfad.tagalong.types.Tag
 import com.hfad.tagalong.types.Track
 import com.hfad.tagalong.views.TagManagerForSingleTrackView
 import com.squareup.picasso.Picasso
@@ -73,8 +74,8 @@ class SingleTrackTaggingActivity : AppCompatActivity() {
             val currentTags = dbHelper.getTagsForSong(track)
             val allTags = dbHelper.getAllTags()
             runOnUiThread {
-                tagManagerView.tagList = currentTags
-                tagManagerView.autoCompleteTagList = allTags
+                tagManagerView.tagList = currentTags.map(Tag::name).toMutableList()
+                tagManagerView.autoCompleteTagList = allTags.map(Tag::name).toMutableList()
             }
         }
     }

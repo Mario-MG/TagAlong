@@ -8,6 +8,7 @@ import com.hfad.tagalong.R
 import com.hfad.tagalong.config.Extras
 import com.hfad.tagalong.tools.adapters.TracksAdapter
 import com.hfad.tagalong.tools.db.room.RoomDbHelper
+import com.hfad.tagalong.types.Tag
 import com.hfad.tagalong.types.Track
 import kotlin.concurrent.thread
 
@@ -17,7 +18,7 @@ class TrackListActivity : AppCompatActivity() {
 
     private var playlistId: String? = null
     private var tagName: String? = null
-    private lateinit var tracks: ArrayList<Track>
+    private lateinit var tracks: List<Track>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,14 +50,14 @@ class TrackListActivity : AppCompatActivity() {
         }
     }
 
-    private fun getTracksForPlaylistId(): ArrayList<Track> {
+    private fun getTracksForPlaylistId(): List<Track> {
         val allTracks = Track.getTracksFromApi(playlistId!!)
-        return allTracks.filter { track -> track.name != "null" } as ArrayList<Track>
+        return allTracks.filter { track -> track.name != "null" }
     }
 
-    private fun getTracksForTagName(): ArrayList<Track> {
+    private fun getTracksForTagName(): List<Track> {
         val dbHelper = RoomDbHelper(this)
-        val tracksWithTag = dbHelper.getSongsWithAnyOfTheTags(tagName!!)
+        val tracksWithTag = dbHelper.getSongsWithAnyOfTheTags(Tag(tagName!!))
         return tracksWithTag
     }
 

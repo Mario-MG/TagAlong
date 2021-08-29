@@ -17,4 +17,7 @@ internal interface TagDao : BaseDao<TagEntity> {
     """
     )
     fun getTagsForSongById(songId: String): List<TagEntity>
+
+    @Delete(entity = TagEntity::class)
+    fun deleteByName(vararg tagName: TagEntity.TagName): Int
 }

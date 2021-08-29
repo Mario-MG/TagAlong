@@ -2,10 +2,10 @@ package com.hfad.tagalong.tools.db.room
 
 import androidx.room.*
 
-internal interface BaseDao<T> {
+internal interface BaseDao<T: DbEntity>: DbDao {
     @Insert
-    fun insert(vararg obj: T)
+    fun insert(obj: T): Long
 
-    @Delete
-    fun delete(vararg obj: T)
+    @Insert
+    fun insertAll(vararg obj: T): List<Long>
 }

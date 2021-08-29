@@ -13,7 +13,7 @@ internal data class SongEntity (
     val album: String,
     val artists: String,
     @ColumnInfo(name = "image_url") val imageUrl: String
-) {
+) : DbEntity() {
     companion object {
         fun toTrack(songEntity: SongEntity): Track {
             return Track(songEntity.id, songEntity.name, songEntity.album,
@@ -26,9 +26,9 @@ internal data class SongEntity (
                 track.artists.joinToString(", "), track.imageUrl ?: "")
         }
     }
-}
 
-internal data class SongId (
-    @ColumnInfo(name = "song_id")
-    val id: String
-)
+    internal data class Id (
+        @ColumnInfo(name = "song_id")
+        val id: String
+    )
+}

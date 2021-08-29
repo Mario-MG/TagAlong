@@ -8,7 +8,7 @@ internal interface SongDao : BaseDao<SongEntity> {
     fun getAll(): List<SongEntity>
 
     @Delete(entity = SongEntity::class)
-    fun deleteById(vararg songIds: SongId)
+    fun deleteById(vararg songIds: SongEntity.Id)
 
     @Query(
         """

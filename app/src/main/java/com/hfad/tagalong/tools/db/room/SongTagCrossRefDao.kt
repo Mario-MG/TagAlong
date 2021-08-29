@@ -9,6 +9,9 @@ internal interface SongTagCrossRefDao : BaseDao<SongTagCrossRef> {
     @Query("SELECT * FROM SongTagCrossRef")
     fun getAll(): List<SongTagCrossRef>
 
+    @Delete
+    fun delete(songTagCrossRef: SongTagCrossRef)
+
 //    @Transaction
 //    @Query("SELECT * FROM Tag WHERE name = :tagName")
 //    fun getSongsTaggedWith(tagName: String): TagWithSongs
