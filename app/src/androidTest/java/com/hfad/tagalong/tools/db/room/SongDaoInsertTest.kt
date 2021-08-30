@@ -1,6 +1,7 @@
 package com.hfad.tagalong.tools.db.room
 
 import androidx.test.filters.SmallTest
+import com.hfad.tagalong.tools.db.room.utils.SongTestUtil.testSong1
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -13,6 +14,6 @@ internal class SongDaoInsertTest : SongDaoTest() {
         dao.insert(testSong1)
         val retrievedSongs = dao.getAll()
         assertEquals(1, retrievedSongs.size)
-        assertEquals(testSongId1, retrievedSongs[0].id)
+        assertEquals(testSong1, retrievedSongs[0])
     }
 }

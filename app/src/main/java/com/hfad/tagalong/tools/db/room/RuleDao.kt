@@ -13,7 +13,7 @@ internal interface RuleDao : BaseDao<RuleEntity> {
     fun getById(ruleId: Long): RuleWithTags
 
     @Delete(entity = RuleEntity::class)
-    fun deleteById(vararg ruleIds: RuleEntity.Id)
+    fun deleteById(vararg ruleIds: RuleEntity.Id): Int
 
     @Transaction
     @Query(

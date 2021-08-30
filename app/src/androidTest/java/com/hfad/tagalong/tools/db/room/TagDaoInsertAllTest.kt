@@ -1,8 +1,10 @@
 package com.hfad.tagalong.tools.db.room
 
 import androidx.test.filters.SmallTest
+import com.hfad.tagalong.tools.db.room.utils.TagTestUtil.testTag1
+import com.hfad.tagalong.tools.db.room.utils.TagTestUtil.testTag2
 import dagger.hilt.android.testing.HiltAndroidTest
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Test
 
 @HiltAndroidTest
@@ -10,14 +12,14 @@ import org.junit.Test
 internal class TagDaoInsertAllTest : TagDaoTest() {
     @Test
     fun insertAll() {
-        val tagIds = dao.insertAll(testTag1, testTag2)
-        assertEquals(2, tagIds.size)
+        val tagsToInsert = arrayOf(testTag1, testTag2)
+        val tagIds = dao.insertAll(*tagsToInsert)
+        assertEquals(tagsToInsert.size, tagIds.size)
         assertEquals(1, tagIds[0])
         assertEquals(2, tagIds[1])
         val retrievedTags = dao.getAll()
-        assertEquals(2, retrievedTags.size)
-        assertEquals(testTagName1, retrievedTags[0].name)
-        assertEquals(testTagName2, retrievedTags[1].name)
-        // TODO: Reescribir el assert para que no dependa del orden
+        assertEquals(tagsToInsert.size, retrievedTags.size)
+        assertTrue(retrievedTags.contains(TagEntity(tagIds[0], tagsToInsert[0].name)))
+        assertTrue(retrievedTags.contains(TagEntity(tagIds[1], tagsToInsert[1].name)))
     }
 }

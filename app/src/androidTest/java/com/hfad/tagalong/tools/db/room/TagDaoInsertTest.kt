@@ -1,8 +1,9 @@
 package com.hfad.tagalong.tools.db.room
 
 import androidx.test.filters.SmallTest
+import com.hfad.tagalong.tools.db.room.utils.TagTestUtil.testTag1
 import dagger.hilt.android.testing.HiltAndroidTest
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Test
 
 @HiltAndroidTest
@@ -14,6 +15,6 @@ internal class TagDaoInsertTest : TagDaoTest() {
         assertEquals(1, tagId)
         val retrievedTags = dao.getAll()
         assertEquals(1, retrievedTags.size)
-        assertEquals(testTagName1, retrievedTags[0].name)
+        assertEquals(TagEntity(1, testTag1.name), retrievedTags[0])
     }
 }
