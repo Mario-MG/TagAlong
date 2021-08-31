@@ -3,12 +3,12 @@ package com.hfad.tagalong.tools.db.room.utils
 import com.hfad.tagalong.tools.db.room.SongEntity
 
 internal object SongTestUtil {
+    private const val testSongId1 = "1"
     private const val testSongId2 = "2"
     private const val testSongId3 = "3"
-    private const val testSongName1 = "one"
-    private const val testSongName2 = "two"
-    private const val testSongId1 = "1"
-    private const val testSongName3 = "three"
+    private const val testSongName1 = "song_one"
+    private const val testSongName2 = "song_two"
+    private const val testSongName3 = "song_three"
     private const val testAlbum1 = "album_one"
     private const val testAlbum2 = "album_two"
     private const val testAlbum3 = "album_three"
