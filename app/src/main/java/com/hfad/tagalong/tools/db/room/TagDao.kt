@@ -7,15 +7,13 @@ internal interface TagDao : BaseDao<TagEntity> {
     @Query("SELECT * FROM Tag")
     fun getAll(): List<TagEntity>
 
-    @Query(
-        """
+    @Query("""
         SELECT * FROM Tag
         WHERE tag_id IN (
             SELECT tag_id FROM SongTagCrossRef
             WHERE song_id = :songId
         )
-    """
-    )
+    """)
     fun getTagsForSongById(songId: String): List<TagEntity>
 
     @Delete(entity = TagEntity::class)

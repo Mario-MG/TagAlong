@@ -16,8 +16,7 @@ internal interface RuleDao : BaseDao<RuleEntity> {
     fun deleteById(vararg ruleIds: RuleEntity.Id): Int
 
     @Transaction
-    @Query(
-        """
+    @Query("""
         SELECT * FROM Rule r
         JOIN RuleTagCrossRef rt ON r.rule_id = rt.rule_id
         JOIN Tag t ON rt.tag_id = t.tag_id
@@ -36,7 +35,6 @@ internal interface RuleDao : BaseDao<RuleEntity> {
                 )
             )
         )
-    """
-    )
+    """)
     fun getRulesFulfilledByTagNames(newTag: String, vararg originalTags: String): List<RuleWithTags>
 }
