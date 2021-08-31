@@ -20,15 +20,13 @@ internal interface SongDao : BaseDao<SongEntity> {
     """)
     fun getSongsWithAnyOfTheTagsByName(vararg tagNames: String): List<SongEntity>
 
-    @Query(
-        """
+    @Query("""
         SELECT s.* FROM Song s
         JOIN SongTagCrossRef st ON s.song_id = st.song_id
         JOIN Tag t ON st.tag_id = t.tag_id
         WHERE t.name IN (:tagNames)
         GROUP BY s.song_id
         HAVING COUNT(*) = (SELECT COUNT(*) FROM Tag WHERE name IN (:tagNames)) -- TODO: Simplificar si es posible
-    """
-    )
+    """)
     fun getSongsWithAllOfTheTagsByName(vararg tagNames: String): List<SongEntity>
 }
