@@ -19,13 +19,13 @@ internal abstract class DaoTest<T: DbDao> {
     internal lateinit var dao: T
 
     @Before
-    fun setup() {
+    open fun setup() {
         hiltRule.inject()
         dao = this.buildDao()
     }
 
     @After
-    fun tearDown() {
+    open fun tearDown() {
         db.clearAllTables()
         db.close()
     }
