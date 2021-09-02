@@ -10,7 +10,7 @@ internal interface RuleDao : BaseDao<RuleEntity> {
 
     @Transaction
     @Query("SELECT * FROM Rule WHERE rule_id = :ruleId")
-    fun getById(ruleId: Long): RuleWithTags
+    fun getById(ruleId: Long): RuleWithTags?
 
     @Delete(entity = RuleEntity::class)
     fun deleteById(vararg ruleIds: RuleEntity.Id): Int

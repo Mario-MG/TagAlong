@@ -13,6 +13,9 @@ internal data class RuleEntity (
     val optionality: Boolean,
     @ColumnInfo(name = "auto_update") val autoUpdate: Boolean
 ) : DbEntity() {
+    constructor(playlistId: String, optionality: Boolean, autoUpdate: Boolean) :
+            this(0, playlistId, optionality, autoUpdate)
+
     companion object {
         fun fromPlaylistCreationRule(playlistCreationRule: PlaylistCreationRule): RuleEntity {
             return RuleEntity(playlistCreationRule.ruleId, playlistCreationRule.playlistId,
