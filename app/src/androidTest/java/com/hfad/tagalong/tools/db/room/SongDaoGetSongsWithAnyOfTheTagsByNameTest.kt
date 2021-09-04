@@ -13,7 +13,7 @@ import org.junit.Test
 
 @HiltAndroidTest
 @SmallTest
-internal class SongDaoGetSongsWithAnyOfTheTagsByName : SongDaoTest() {
+internal class SongDaoGetSongsWithAnyOfTheTagsByNameTest : SongDaoTest() {
     @Test
     fun getSongsWithAnyOfTheTagsByName() {
         val songsToInsert = arrayOf(testSong1, testSong2, testSong3)

@@ -2,6 +2,7 @@ package com.hfad.tagalong.tools.db.room
 
 import android.content.Context
 import androidx.room.*
+import io.requery.android.database.sqlite.RequerySQLiteOpenHelperFactory
 
 @Database(entities = [
     TagEntity::class,
@@ -35,6 +36,8 @@ internal abstract class RoomDb : RoomDatabase() {
                 context.applicationContext,
                 RoomDb::class.java,
                 "RoomDatabase.db"
-            ).build()
+            )
+                .openHelperFactory(RequerySQLiteOpenHelperFactory())
+                .build()
     }
 }

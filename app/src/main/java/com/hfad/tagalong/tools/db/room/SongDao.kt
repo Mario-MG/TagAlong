@@ -26,7 +26,7 @@ internal interface SongDao : BaseDao<SongEntity> {
         JOIN Tag t ON st.tag_id = t.tag_id
         WHERE t.name IN (:tagNames)
         GROUP BY s.song_id
-        HAVING COUNT(*) = (SELECT COUNT(*) FROM Tag WHERE name IN (:tagNames)) -- TODO: Simplificar si es posible
+        HAVING COUNT(*) = JSON_ARRAY_LENGTH(JSON_ARRAY(:tagNames))
     """)
     fun getSongsWithAllOfTheTagsByName(vararg tagNames: String): List<SongEntity>
 }

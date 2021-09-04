@@ -3,7 +3,6 @@ package com.hfad.tagalong.tools.db.room
 import androidx.test.filters.SmallTest
 import com.hfad.tagalong.tools.db.room.utils.SongTestUtil.testSong1
 import com.hfad.tagalong.tools.db.room.utils.SongTestUtil.testSong2
-import com.hfad.tagalong.tools.db.room.utils.SongTestUtil.testSong3
 import com.hfad.tagalong.tools.db.room.utils.TagTestUtil.testTag1
 import com.hfad.tagalong.tools.db.room.utils.TagTestUtil.testTag2
 import com.hfad.tagalong.tools.db.room.utils.TagTestUtil.testTag3
@@ -13,28 +12,25 @@ import org.junit.Test
 
 @HiltAndroidTest
 @SmallTest
-internal class SongDaoGetSongsWithAllOfTheTagsByName : SongDaoTest() {
+internal class TagDaoGetTagsForSongByIdTest : TagDaoTest() {
     @Test
-    fun getSongsWithAllOfTheTagsByName() {
-        val songsToInsert = arrayOf(testSong1, testSong2, testSong3)
-        dao.insertAll(*songsToInsert)
-        val tagDao = db.tagDao()
+    fun getTagsForSongById() {
         val tagsToInsert = arrayOf(testTag1, testTag2, testTag3)
-        val tagIds = tagDao.insertAll(*tagsToInsert)
+        val tagIds = dao.insertAll(*tagsToInsert)
+        val songDao = db.songDao()
+        val songsToInsert = arrayOf(testSong1, testSong2)
+        songDao.insertAll(*songsToInsert)
         val songTagCrossRefDao = db.songTagCrossRefDao()
         val songTagCrossRefsToInsert = arrayOf(
             SongTagCrossRef(testSong1.id, tagIds[0]),
             SongTagCrossRef(testSong1.id, tagIds[1]),
-            SongTagCrossRef(testSong1.id, tagIds[2]),
-            SongTagCrossRef(testSong2.id, tagIds[0]),
-            SongTagCrossRef(testSong3.id, tagIds[1]),
-            SongTagCrossRef(testSong3.id, tagIds[2])
+            SongTagCrossRef(testSong2.id, tagIds[2])
         )
         songTagCrossRefDao.insertAll(*songTagCrossRefsToInsert)
-        val retrievedSongs = dao.getSongsWithAllOfTheTagsByName(tagsToInsert[0].name, tagsToInsert[1].name)
-        assertEquals(1, retrievedSongs.size)
-        assertTrue(retrievedSongs.contains(testSong1))
-        assertFalse(retrievedSongs.contains(testSong2))
-        assertFalse(retrievedSongs.contains(testSong3))
+        val retrievedTags = dao.getTagsForSongById(testSong1.id)
+        assertEquals(2, retrievedTags.size)
+        assertTrue(retrievedTags.contains(TagEntity(tagIds[0], tagsToInsert[0].name)))
+        assertTrue(retrievedTags.contains(TagEntity(tagIds[1], tagsToInsert[1].name)))
+        assertFalse(retrievedTags.contains(TagEntity(tagIds[2], tagsToInsert[2].name)))
     }
 }

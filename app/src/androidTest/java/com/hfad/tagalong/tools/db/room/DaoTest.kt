@@ -1,6 +1,7 @@
 package com.hfad.tagalong.tools.db.room
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.sqlite.db.SimpleSQLiteQuery
 import dagger.hilt.android.testing.HiltAndroidRule
 import org.junit.*
 import javax.inject.*
@@ -25,9 +26,9 @@ internal abstract class DaoTest<T: DbDao> {
     }
 
     @After
-    open fun tearDown() {
+    open fun clearTables() {
         db.clearAllTables()
-        db.close()
+        db.openHelper.writableDatabase.execSQL("DELETE FROM Sqlite_Sequence")
     }
 
     internal abstract fun buildDao(): T
